@@ -1,0 +1,25 @@
+# Local kernel source cache (multi-GB; rebuild with build scripts)
+.cache/
+
+# Nested clone metadata (kept locally; content is vendored in this repo)
+**/.git.bak/
+**/.git/
+
+# Build outputs (rebuild with scripts)
+**/out/
+arm-trusted-firmware/build/
+docs/.bin/
+
+# Editor / local tooling
+.cursor/
+*.swp
+*~
+.DS_Store
+
+# Logs that churn every build (keep MEMORY-LAYOUT and binaries)
+artifacts/rpi5-optee/build.log
+artifacts/rpi5-optee/kernel-build.log
+
+# Host-local module build symlinks
+artifacts/**/lib/modules/*/build
+artifacts/**/lib/modules/*/source

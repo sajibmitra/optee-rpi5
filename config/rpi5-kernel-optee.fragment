@@ -1,0 +1,3 @@
+# Enable Linux OP-TEE driver (required for /dev/tee0).
+CONFIG_TEE=y
+CONFIG_OPTEE=y

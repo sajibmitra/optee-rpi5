@@ -1,0 +1,25 @@
+Raspberry Pi 5 OP-TEE memory layout
+===================================
+
+Armstub (armstub8-2712-optee.bin), loaded at PA 0 by VPU:
+  0x00000000 - 0x00080000  BL31 (TF-A, SPD=opteed)
+  0x00080000 - 0x00100000  Embedded OP-TEE (tee-raw.bin, padded)
+
+Runtime:
+  0x1D000000 + 0x02000000  TZDRAM / BL32 (OP-TEE)
+  0x08000000 + 0x00400000                 OP-TEE shared memory (CFG_SHMEM_*)
+  0x08400000 + 0x00010000                 Secure-world log ring (optee_sw_log)
+
+Linux must use:
+  kernel_address=0x200000
+so the kernel image does not overwrite the embedded OP-TEE before BL31 copies
+it to TZDRAM.
+
+BL32 handoff (opteed): arg0=MODE_RW_64, arg1/arg2=0, arg3=DTB PA.
+Do not use dtoverlay=optee-rpi5; OP-TEE CFG_DT=y patches the DTB at boot.
+
+Secure-world live log over SSH: sudo optee-sw-log -f
+  (ring buffer at 0x08400000; also mirrored on PL011 UART if serial attached)
+
+Note: Linux needs CONFIG_TEE/OPTEE driver for /dev/tee* (not in default Pi kernel).
+Kernel image: artifacts/rpi5-optee/kernel_2712-optee.img (CONFIG_TEE/OPTEE=y).

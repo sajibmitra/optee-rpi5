@@ -1,0 +1,108 @@
+diff --git a/plat/rpi/common/rpi4_bl31_setup.c b/plat/rpi/common/rpi4_bl31_setup.c
+index a7228fd4f..29938aa7d 100644
+--- a/plat/rpi/common/rpi4_bl31_setup.c
++++ b/plat/rpi/common/rpi4_bl31_setup.c
+@@ -7,6 +7,7 @@
+ #include <assert.h>
+ #include <inttypes.h>
+ #include <stdint.h>
++#include <string.h>
+ 
+ #include <arch_helpers.h>
+ #include <common/bl_common.h>
+@@ -136,6 +137,32 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
+ 	bl33_image_ep_info.spsr = rpi3_get_spsr_for_bl33_entry();
+ 	SET_SECURITY_STATE(bl33_image_ep_info.h.attr, NON_SECURE);
+ 
++#ifdef RPI5_EMBEDDED_OPTEE
++	NOTICE("rpi: copying embedded OP-TEE from 0x%lx to 0x%lx (%lu bytes)\n",
++	       (unsigned long)RPI5_OPTEE_EMBED_BASE,
++	       (unsigned long)RPI5_OPTEE_LOAD_BASE,
++	       (unsigned long)RPI5_OPTEE_EMBED_SIZE);
++	memcpy((void *)RPI5_OPTEE_LOAD_BASE, (const void *)RPI5_OPTEE_EMBED_BASE,
++	       RPI5_OPTEE_EMBED_SIZE);
++	flush_dcache_range(RPI5_OPTEE_LOAD_BASE, RPI5_OPTEE_EMBED_SIZE);
++
++	bl32_image_ep_info.pc = RPI5_OPTEE_LOAD_BASE;
++	bl32_image_ep_info.spsr = rpi3_get_spsr_for_bl32_entry();
++	/*
++	 * opteed default handoff (see opteed_main.c / optee_utils.c):
++	 *   arg0 = MODE_RW_64 (aarch64) or MODE_RW_32
++	 *   arg1 = pageable part PA (0 for unpaged tee-raw)
++	 *   arg2 = pageable size (0 for unpaged tee-raw)
++	 *   arg3 = DTB PA for CFG_DT=y
++	 * Putting the DTB in arg0 breaks opteed and hangs before Linux boots.
++	 */
++	bl32_image_ep_info.args.arg0 = MODE_RW_64;
++	bl32_image_ep_info.args.arg1 = 0ULL;
++	bl32_image_ep_info.args.arg2 = 0ULL;
++	bl32_image_ep_info.args.arg3 = rpi4_get_dtb_address();
++	SET_SECURITY_STATE(bl32_image_ep_info.h.attr, SECURE);
++#endif
++
+ #if RPI3_DIRECT_LINUX_BOOT
+ # if RPI3_BL33_IN_AARCH32
+ 	/*
+@@ -186,6 +213,16 @@ void bl31_plat_arch_setup(void)
+ 	 */
+ 	mmap_add_region(0, 0, 4096, MT_NON_CACHEABLE | MT_RW | MT_SECURE);
+ 
++#ifdef RPI5_EMBEDDED_OPTEE
++	/*
++	 * Keep the armstub-resident OP-TEE payload mapped until after the
++	 * early memcpy into TZDRAM (already done). Harmless once copied.
++	 */
++	mmap_add_region(RPI5_OPTEE_EMBED_BASE, RPI5_OPTEE_EMBED_BASE,
++			RPI5_OPTEE_EMBED_SIZE,
++			MT_MEMORY | MT_RW | MT_SECURE);
++#endif
++
+ 	rpi3_setup_page_tables(BL31_BASE, BL31_END - BL31_BASE,
+ 			       BL_CODE_BASE, BL_CODE_END,
+ 			       BL_RO_DATA_BASE, BL_RO_DATA_END
+diff --git a/plat/rpi/rpi5/include/platform_def.h b/plat/rpi/rpi5/include/platform_def.h
+index a4c2f5b9d..5f9cdcf52 100644
+--- a/plat/rpi/rpi5/include/platform_def.h
++++ b/plat/rpi/rpi5/include/platform_def.h
+@@ -108,6 +108,30 @@
+ #define BL31_LIMIT			ULL(0x80000)
+ #define BL31_PROGBITS_LIMIT		ULL(0x80000)
+ 
++/*
++ * RPi5 has no BL2/FIP path for OP-TEE. Embed BL32 (tee-raw.bin) in the
++ * armstub immediately after BL31, then copy it to TZDRAM at boot.
++ *
++ * Armstub layout (loaded at PA 0 by the VPU):
++ *   [0x00000, 0x80000)  BL31
++ *   [0x80000, 0x100000) embedded OP-TEE (RPI5_OPTEE_EMBED_SIZE)
++ *
++ * TZDRAM must match OP-TEE CFG_TZDRAM_START/SIZE (plat-rpi5).
++ * Linux kernel must load at >= 0x200000 so it does not overwrite the
++ * embedded OP-TEE before BL31 copies it (see deploy-rpi5-optee.sh).
++ */
++#define RPI5_EMBEDDED_OPTEE		1
++#define RPI5_OPTEE_EMBED_BASE		ULL(0x80000)
++#define RPI5_OPTEE_EMBED_SIZE		ULL(0x80000)
++#define RPI5_OPTEE_LOAD_BASE		ULL(0x1D000000)
++#define RPI5_OPTEE_LOAD_SIZE		ULL(0x02000000)
++
++/* Required so BL31 page tables map TZDRAM for SPD=opteed handoff. */
++#define BL32_BASE			RPI5_OPTEE_LOAD_BASE
++#define BL32_LIMIT			(RPI5_OPTEE_LOAD_BASE + RPI5_OPTEE_LOAD_SIZE)
++#define BL32_MEM_BASE			BL32_BASE
++#define BL32_MEM_SIZE			RPI5_OPTEE_LOAD_SIZE
++
+ #define SEC_SRAM_ID			0
+ #define SEC_DRAM_ID			1
+ 
+@@ -117,8 +141,8 @@
+ #define PLAT_PHY_ADDR_SPACE_SIZE	(ULL(1) << 40)
+ #define PLAT_VIRT_ADDR_SPACE_SIZE	(ULL(1) << 40)
+ 
+-#define MAX_MMAP_REGIONS		8
+-#define MAX_XLAT_TABLES			4
++#define MAX_MMAP_REGIONS		12
++#define MAX_XLAT_TABLES			8
+ 
+ #define MAX_IO_DEVICES			U(3)
+ #define MAX_IO_HANDLES			U(4)

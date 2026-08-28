@@ -1,0 +1,85 @@
+diff --git a/core/arch/arm/kernel/boot.c b/core/arch/arm/kernel/boot.c
+index bcb07a40e..05dcfa428 100644
+--- a/core/arch/arm/kernel/boot.c
++++ b/core/arch/arm/kernel/boot.c
+@@ -814,6 +814,11 @@ static int mark_tzdram_as_reserved(struct dt_descriptor *dt)
+ 				   CFG_TZDRAM_SIZE);
+ }
+ 
++int __weak plat_dt_add_reserved_mem(struct dt_descriptor *dt __unused)
++{
++	return 0;
++}
++
+ static void update_external_dt(void)
+ {
+ 	struct dt_descriptor *dt = get_external_dt_desc();
+@@ -834,6 +839,9 @@ static void update_external_dt(void)
+ 
+ 	if (mark_tzdram_as_reserved(dt))
+ 		panic("Failed to config secure memory");
++
++	if (plat_dt_add_reserved_mem(dt))
++		panic("Failed to add platform reserved memory");
+ }
+ #else /*CFG_DT*/
+ static void update_external_dt(void)
+diff --git a/core/arch/arm/plat-rpi5/conf.mk b/core/arch/arm/plat-rpi5/conf.mk
+index 4bc963508..e4aa3891f 100644
+--- a/core/arch/arm/plat-rpi5/conf.mk
++++ b/core/arch/arm/plat-rpi5/conf.mk
+@@ -12,10 +12,15 @@ CFG_TZDRAM_START    ?= 0x1D000000
+ CFG_TZDRAM_SIZE     ?= 0x02000000
+ CFG_TEE_RAM_VA_SIZE ?= 0x00700000
+ CFG_DT              ?= y
+-CFG_DTB_MAX_SIZE    ?= 0x20000
++# Extra headroom for optee_core / optee_shm / optee_sw_log reserved-memory nodes
++CFG_DTB_MAX_SIZE    ?= 0x40000
+ 
+ $(call force,CFG_PL011,y)
+ $(call force,CFG_SECURE_TIME_SOURCE_CNTPCT,y)
+ $(call force,CFG_WITH_ARM_TRUSTED_FW,y)
+ 
+ CFG_NUM_THREADS ?= 4
++
++# Secure-world log ring in NS RAM for SSH monitoring (optee-sw-log).
++# Mapped as MEM_AREA_IO_NSEC so io_pa_or_va works after MMU is on.
++CFG_RPI5_SW_LOG ?= y
+diff --git a/core/arch/arm/plat-rpi5/platform_config.h b/core/arch/arm/plat-rpi5/platform_config.h
+index 913fe5ad7..af7669f12 100644
+--- a/core/arch/arm/plat-rpi5/platform_config.h
++++ b/core/arch/arm/plat-rpi5/platform_config.h
+@@ -19,4 +19,8 @@
+ #define DRAM0_BASE		0x00000000
+ #define DRAM0_SIZE		0x200000000
+ 
++/* NS ring buffer for secure-world logs (SSH monitor via optee-sw-log) */
++#define RPI5_SW_LOG_PADDR	0x08400000ULL
++#define RPI5_SW_LOG_SIZE	0x00010000ULL
++
+ #endif /* PLATFORM_CONFIG_H */
+diff --git a/core/arch/arm/plat-rpi5/sub.mk b/core/arch/arm/plat-rpi5/sub.mk
+index 8ddc2fd45..002adb403 100644
+--- a/core/arch/arm/plat-rpi5/sub.mk
++++ b/core/arch/arm/plat-rpi5/sub.mk
+@@ -1,2 +1,3 @@
+ global-incdirs-y += .
+ srcs-y += main.c
++srcs-$(CFG_RPI5_SW_LOG) += sw_log.c
+diff --git a/core/include/kernel/boot.h b/core/include/kernel/boot.h
+index 5094d11db..c95c292d8 100644
+--- a/core/include/kernel/boot.h
++++ b/core/include/kernel/boot.h
+@@ -110,6 +110,12 @@ void discover_nsec_memory(void);
+ /* Add reserved memory for static shared memory in the device-tree */
+ int mark_static_shm_as_reserved(struct dt_descriptor *dt);
+ 
++/*
++ * plat_dt_add_reserved_mem() - Platform hook to add extra reserved-memory nodes.
++ * Return 0 on success, negative error code on failure.
++ */
++int plat_dt_add_reserved_mem(struct dt_descriptor *dt);
++
+ /*
+  * Stack-like memory allocations during boot before a heap has been
+  * configured. boot_mem_relocate() performs relocation of the boot memory

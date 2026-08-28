@@ -1,0 +1,27 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2712";
+
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			reserved-memory {
+				#address-cells = <2>;
+				#size-cells = <2>;
+				ranges;
+
+				optee@1d000000 {
+					reg = <0x0 0x1d000000 0x0 0x02000000>;
+					no-map;
+				};
+
+				optee-shm@8000000 {
+					reg = <0x0 0x08000000 0x0 0x00400000>;
+					no-map;
+				};
+			};
+		};
+	};
+};
