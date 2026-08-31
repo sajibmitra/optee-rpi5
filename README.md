@@ -4,6 +4,35 @@ Build, deploy, and test **real OP-TEE** on Raspberry Pi 5 (embedded armstub + cu
 
 ## Quick start
 
+### Option 1: Use Pre-built SD Card Image (Fastest)
+
+A validated, pre-built SD card image is available on Google Drive. This image contains a complete, tested OP-TEE environment ready to use.
+
+**Download:** [Raspberry Pi 5 OP-TEE SD Card Image](https://drive.google.com/file/d/1VSLtJFr75WE-CwRTMUFp2P5EHyy8jKpu/view?usp=drive_link)
+
+**Image Contents:**
+- Custom Linux kernel with OP-TEE support
+- ARM Trusted Firmware (TF-A) bootloader
+- OP-TEE OS (secure world)
+- OP-TEE userspace libraries and tools
+- Trusted Applications (TAs)
+- Testing tools and validation suite
+
+**Validation Status:**
+✅ All 114 OP-TEE regression test cases passed (after resolving missing plugin issue)
+
+**Default Credentials:**
+- Username: `skmitra`
+- Password: `testP!26`
+
+**Installation:**
+1. Download the image from Google Drive
+2. Extract the compressed image: `gunzip rpi5-optee.img.gz`
+3. Follow the [Flush Raspberry Pi Image to SD Card](#flush-raspberry-pi-image-to-sd-card) instructions below
+4. Insert SD card into Raspberry Pi 5 and power on
+
+### Option 2: Build from Source
+
 ```bash
 # Build firmware + userspace overlay
 OPTEE_MAX_LOG=1 ./build-rpi5-optee.sh
