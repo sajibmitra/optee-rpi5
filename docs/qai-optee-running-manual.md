@@ -206,7 +206,7 @@ cd /path/to/pi5-optee
 export PI_TARGET=skmitra@172.20.10.2
 export PI_SUDO_PASSWORD='testP!26'
 
-OUT=optee_examples/qai_ta/out
+OUT=~/optee/pi5-optee/optee_examples/qai_ta/out
 TA=24173bc2-5143-4d91-92c5-ffae31dc618d.ta
 
 scp "$OUT/ca/qai_host" "$PI_TARGET:/tmp/qai_host"
@@ -226,7 +226,8 @@ EOF
 ### 5.2 Helper script (interactive sudo)
 
 ```bash
-./optee_examples/qai_ta/scripts/deploy-qai-ta.sh skmitra@172.20.10.2
+
+~/optee/pi5-optee/optee_examples/qai_ta/scripts/deploy-qai-ta.sh skmitra@172.20.10.2
 ```
 
 You may be prompted for the Pi sudo password.
