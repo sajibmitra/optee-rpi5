@@ -49,6 +49,9 @@ export PI_SUDO_PASSWORD='...'
 ## Documentation
 
 - LaTeX / PDF: `docs/rpi5-optee-manual.tex`, `docs/rpi5-optee-manual.pdf`
+- QAI running manual: `docs/qai-optee-running-manual.md`
+- QAI prototype roadmap: `docs/qai-optee-prototype-roadmap.md`
+- QAI TA example: `optee_examples/qai_ta/` (build/deploy via `scripts/` there)
 - Memory layout: `artifacts/rpi5-optee/MEMORY-LAYOUT.txt`
 - Local ATF / OP-TEE OS patches: `patches/`
 

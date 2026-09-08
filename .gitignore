@@ -23,3 +23,17 @@ artifacts/rpi5-optee/kernel-build.log
 # Host-local module build symlinks
 artifacts/**/lib/modules/*/build
 artifacts/**/lib/modules/*/source
+
+# qai_ta build products
+optee_examples/qai_ta/out/
+optee_examples/qai_ta/host/*.o
+optee_examples/qai_ta/host/qai_host
+optee_examples/qai_ta/ta/*.o
+optee_examples/qai_ta/ta/*.elf
+optee_examples/qai_ta/ta/*.ta
+optee_examples/qai_ta/ta/*.dmp
+optee_examples/qai_ta/ta/*.map
+optee_examples/qai_ta/ta/*.cmd
+optee_examples/qai_ta/ta/*.d
+optee_examples/qai_ta/ta/dyn_list
+optee_examples/qai_ta/ta/ta.lds

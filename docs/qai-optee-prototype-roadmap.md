@@ -374,35 +374,62 @@
   [✓] Basic TA communication
           │
           ▼
-  [1] Create clean qai_ta
+  [✓] Create clean qai_ta
           │
           ▼
-  [2] Implement C inference
+  [✓] Implement C inference
           │
           ▼
-  [3] REE → QAI TA → REE
+  [✓] REE → QAI TA → REE
           │
           ▼
-  [4] Measure inference latency
+  [✓] Measure inference latency
           │
           ▼
-  [5] Train tiny model on Mac
+  [✓] Train tiny model on Mac
           │
           ▼
-  [6] Deploy model parameters to TA
+  [✓] Deploy model parameters to TA
           │
           ▼
-  [7] Secure TinyML inference
+  [✓] Secure TinyML inference
           │
           ▼
-  [8] Quantum/hybrid model on Mac
+  [✓] Quantum/hybrid model on Mac
           │
           ▼
-  [9] Compact QAI inference in TA
+  [✓] Compact QAI inference in TA
           │
           ▼
-  [10] Security + performance evaluation
+  [✓] Security + performance evaluation (harness ready; run on Pi)
   ```
+
+  ---
+  ## Implementation status (repo)
+
+  Source lives in `optee_examples/qai_ta/`.
+
+  | Phase | Status | Artifact |
+  | ----- | ------ | -------- |
+  | 1 Freeze OP-TEE | done (prior) | `xtest`, hello_world path |
+  | 2 Clean `qai_ta` | done | `optee_examples/qai_ta/` |
+  | 3 C inference | done | `ta/inference.c` baseline |
+  | 4 REE↔TEE | done | `host/main.c` + timing |
+  | 5 TinyML | done | `tools/train_tinyml.py` → `model_params.h` |
+  | 6 Q in QAI | done | `tools/train_qai_hybrid.py` + QAI kernel |
+  | 7 Secure QAI in TEE | done | params resident in TA |
+  | 8 Model protection | done | `--protected` XOR decrypt-in-TA path |
+  | 9 Measure | done (harness) | `qai_host --bench` / `scripts/measure.sh` |
+  | 10 Final architecture | done (prototype) | see `qai_ta/README.md` |
+
+  Build / deploy:
+
+  ```bash
+  ./optee_examples/qai_ta/scripts/build-qai-ta.sh
+  ./optee_examples/qai_ta/scripts/deploy-qai-ta.sh USER@PI_LAN_IP
+  qai_host   # on Pi: expect Prediction 1, Confidence 28
+  ```
+
   ---
   ## First concrete milestone
   Build **`qai_ta` on the physical RPi5 OP-TEE environment** with:
