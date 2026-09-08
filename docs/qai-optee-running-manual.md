@@ -220,7 +220,8 @@ EOF
 ### 5.2 Helper script (interactive sudo)
 
 ```bash
-./optee_examples/qai_ta/scripts/deploy-qai-ta.sh skmitra@172.20.10.2
+
+~/optee/pi5-optee/optee_examples/qai_ta/scripts/deploy-qai-ta.sh skmitra@172.20.10.2
 ```
 
 You may be prompted for the Pi sudo password.
