@@ -1,5 +1,9 @@
 # Raspberry Pi 5 OP-TEE documentation
 
+Paths in these manuals are relative to the **`pi5-optee` repository root**.
+This repo is independent (and may be used as a submodule elsewhere); it does
+**not** require a parent `~/optee` directory.
+
 ## Platform (OP-TEE on Pi 5)
 
 - LaTeX source: `rpi5-optee-manual.tex`

@@ -61,7 +61,7 @@
   ### Phase 2 — Create a clean QAI-OPTEE TA
   Create a dedicated TA under:
   ```text
-  ~/pi5-optee/optee_examples/qai_ta/
+  optee_examples/qai_ta/
   ```
   Do **not** keep modifying `hello_world`.
   Recommended structure:

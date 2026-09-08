@@ -1,5 +1,7 @@
 # Building and Verifying `xtest` on Raspberry Pi 5
 
+> Paths such as `cd /path/to/pi5-optee` mean the **pi5-optee repository root** (standalone clone or submodule checkout). A parent `~/optee` tree is not required.
+
 This document explains what the monitoring script does with `xtest`, how `xtest`
 is built and deployed today, and how to **build `xtest` on the Pi 5 from source**
 to demonstrate on-device self-building availability.
@@ -73,7 +75,7 @@ You need three things on the Pi:
 On the **build host**:
 
 ```bash
-cd ~/optee/pi5-optee
+cd /path/to/pi5-optee
 tar czf /tmp/optee-onpi-build-deps.tgz \
   optee_test \
   optee_os/out/arm-plat-rpi5/export-ta_arm64 \
@@ -81,7 +83,7 @@ tar czf /tmp/optee-onpi-build-deps.tgz \
 scp /tmp/optee-onpi-build-deps.tgz skmitra@172.20.10.2:/tmp/
 ```
 
-On the **Pi**:
+On the **Pi** (any home work directory is fine; `~/optee-onpi-build` is only a local staging folder on the device, not related to a host monorepo):
 
 ```bash
 sudo apt update

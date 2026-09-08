@@ -63,7 +63,7 @@ Firmware & \cmd{armstub8-2712-optee.bin} (1\,MiB) & BL31 + tee-raw embedded \\
 Secure OS & OP-TEE OS (plat-rpi5), CFG\_DT=y & BL32 in TZDRAM; DT patched at boot \\
 Kernel & \cmd{kernel_2712-optee.img} & TEE/OPTEE drivers $\rightarrow$ \cmd{/dev/tee*} \\
 Userspace & tee-supplicant, libteec, xtest, TAs & RPC + regression suite \\
-Host & Shell scripts under \cmd{~/pi5-optee} & Build, LAN deploy, test, recover \\
+Host & Shell scripts under \cmd{pi5-optee/} (repository root) & Build, LAN deploy, test, recover \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -270,7 +270,7 @@ Set \cmd{export PI_SUDO_PASSWORD='...'} (or \cmd{SSHPASS}); do not hardcode secr
 
 \subsection{Build}
 \begin{verbatim}
-cd ~/pi5-optee
+cd /path/to/pi5-optee
 OPTEE_MAX_LOG=1 ./build-rpi5-optee.sh
 ./build-rpi5-optee-kernel.sh   # if kernel not built by the above
 \end{verbatim}

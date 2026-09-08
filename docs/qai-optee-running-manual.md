@@ -45,6 +45,12 @@ Confidence : 28
 
 ## 2. Prerequisites
 
+> **Repo layout:** `pi5-optee` is an **independent git repository** (it may also be
+> checked out as a git submodule of another project). All paths below are relative to
+> **this repository's root** (`/path/to/pi5-optee/...`). Do not assume any particular
+> parent directory name or monorepo layout on the build host.
+
+
 ### 2.1 Hardware / platform
 
 | Item | Requirement |
@@ -86,7 +92,7 @@ aarch64-linux-gnu-gcc                          # CROSS_COMPILE
 Quick check on the **build host**:
 
 ```bash
-cd ~/optee/pi5-optee
+cd /path/to/pi5-optee
 test -f optee_os/out/arm-plat-rpi5/export-ta_arm64/mk/ta_dev_kit.mk && echo TA_DEV_KIT_OK
 test -d optee_client/out/export/usr/include && echo TEEC_OK
 which aarch64-linux-gnu-gcc
@@ -146,7 +152,7 @@ UUID: `24173bc2-5143-4d91-92c5-ffae31dc618d`
 From the repo root:
 
 ```bash
-cd ~/optee/pi5-optee
+cd /path/to/pi5-optee
 ./optee_examples/qai_ta/scripts/build-qai-ta.sh
 ```
 
@@ -176,7 +182,7 @@ ls -lh optee_examples/qai_ta/out/ta/*.ta
 ### Manual build (equivalent)
 
 ```bash
-cd ~/optee/pi5-optee/optee_examples/qai_ta
+cd /path/to/pi5-optee/optee_examples/qai_ta
 make clean || true
 make \
   CROSS_COMPILE=aarch64-linux-gnu- \
@@ -196,7 +202,7 @@ The helper script uses interactive `sudo` over SSH. On this image,
 Use the following reliable method:
 
 ```bash
-cd ~/optee/pi5-optee
+cd /path/to/pi5-optee
 export PI_TARGET=skmitra@172.20.10.2
 export PI_SUDO_PASSWORD='testP!26'
 
@@ -424,7 +430,7 @@ You should see TA messages such as:
 Do **not** train inside the TA. Train offline, then embed compact integers.
 
 ```bash
-cd ~/optee/pi5-optee/optee_examples/qai_ta
+cd /path/to/pi5-optee/optee_examples/qai_ta
 
 python3 tools/train_tinyml.py
 python3 tools/train_qai_hybrid.py
@@ -507,7 +513,7 @@ Core claim for papers / reports:
 
 ```bash
 # --- on build host ---
-cd ~/optee/pi5-optee
+cd /path/to/pi5-optee
 export PI_TARGET=skmitra@172.20.10.2
 export PI_SUDO_PASSWORD='testP!26'
 

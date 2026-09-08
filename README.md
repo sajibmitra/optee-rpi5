@@ -4,6 +4,8 @@ Build, deploy, and test **real OP-TEE** on Raspberry Pi 5 (embedded armstub + cu
 
 This repository is also the experimental base for **Hybrid QAI (Quantum AI) deployment in OP-TEE**: keep Trusted Applications small and deterministic, run sensitive inference / model parameters in the TEE, and measure REE↔TEE behaviour on physical hardware.
 
+**Repository layout:** `pi5-optee` is an **independent git repository**. It may be checked out on its own or as a git submodule of another tree. All paths in this README and under `docs/` are relative to **this repository's root**. Do not assume a parent `optee/` monorepo (for example `~/optee/pi5-optee`) exists.
+
 ## Research milestone timeline (QAI on OP-TEE)
 
 Chronology of achieved milestones for this research track (Raspberry Pi 5 + real OP-TEE → Hybrid QAI prototype).
