@@ -18,7 +18,6 @@
 
 #include <qai_ta.h>
 
-#define FEAT QAI_KERNEL_FEAT
 #define CHUNK 32
 
 static int tee_open(TEEC_Context *ctx, TEEC_Session *sess)
@@ -39,16 +38,16 @@ static int tee_open(TEEC_Context *ctx, TEEC_Session *sess)
 	return 0;
 }
 
-static int read_matrix(const char *path, uint32_t rows, float *dst)
+static int read_matrix(const char *path, uint32_t rows, uint32_t feat, float *dst)
 {
 	FILE *f = fopen(path, "rb");
 	size_t n;
 
 	if (!f)
 		return -1;
-	n = fread(dst, sizeof(float), (size_t)rows * FEAT, f);
+	n = fread(dst, sizeof(float), (size_t)rows * feat, f);
 	fclose(f);
-	return n == (size_t)rows * FEAT ? 0 : -1;
+	return n == (size_t)rows * feat ? 0 : -1;
 }
 
 int main(int argc, char **argv)
@@ -70,17 +69,31 @@ int main(int argc, char **argv)
 	size_t out_cap;
 
 	uint32_t cmd = TA_QAI_CMD_QOC_BLOCK;
-	const char *model_name = "QOC-SVM";
+	uint32_t n_qubits = 8;
+	uint32_t feat = 16;
+	const char *model_name = "QOC-SVM-8q";
 	int base = 1;
 
-	if (argc == 7 && strcmp(argv[1], "--qmoc") == 0) {
+	if (argc >= 2 && strcmp(argv[1], "--qmoc") == 0) {
 		cmd = TA_QAI_CMD_QMOC_BLOCK;
-		model_name = "QMOC-SVM";
+		model_name = "QMOC-SVM-8q";
+		base = 2;
+	} else if (argc >= 2 && strcmp(argv[1], "--qoc16") == 0) {
+		cmd = TA_QAI_CMD_QOC_BLOCK;
+		n_qubits = 16;
+		feat = 32;
+		model_name = "QOC-SVM-16q";
+		base = 2;
+	} else if (argc >= 2 && strcmp(argv[1], "--qmoc16") == 0) {
+		cmd = TA_QAI_CMD_QMOC_BLOCK;
+		n_qubits = 16;
+		feat = 32;
+		model_name = "QMOC-SVM-16q";
 		base = 2;
 	}
 	if (argc != base + 5) {
 		fprintf(stderr,
-			"Usage: %s [--qmoc] ref.bin n_ref query.bin n_query out.bin\n",
+			"Usage: %s [--qmoc|--qoc16|--qmoc16] ref.bin n_ref query.bin n_query out.bin\n",
 			argv[0]);
 		return 2;
 	}
@@ -89,20 +102,20 @@ int main(int argc, char **argv)
 	if (n_ref == 0 || n_query == 0 || n_ref > 100000 || n_query > 100000)
 		errx(1, "bad dimensions");
 
-	ref = calloc((size_t)n_ref * FEAT, sizeof(float));
-	query = calloc((size_t)n_query * FEAT, sizeof(float));
+	ref = calloc((size_t)n_ref * feat, sizeof(float));
+	query = calloc((size_t)n_query * feat, sizeof(float));
 	out = calloc((size_t)n_query * n_ref, sizeof(float));
 	in_cap = sizeof(struct qai_kernel_block_in) +
-		 (size_t)(CHUNK + 1) * FEAT * sizeof(float);
+		 (size_t)(CHUNK + 1) * feat * sizeof(float);
 	out_cap = sizeof(struct qai_kernel_block_out) +
 		  (size_t)CHUNK * sizeof(float);
 	inbuf = malloc(in_cap);
 	outbuf = malloc(out_cap);
 	if (!ref || !query || !out || !inbuf || !outbuf)
 		err(1, "alloc");
-	if (read_matrix(argv[base], n_ref, ref) != 0)
+	if (read_matrix(argv[base], n_ref, feat, ref) != 0)
 		err(1, "read ref");
-	if (read_matrix(argv[base + 2], n_query, query) != 0)
+	if (read_matrix(argv[base + 2], n_query, feat, query) != 0)
 		err(1, "read query");
 	if (tee_open(&ctx, &sess) != 0)
 		errx(1, "TEE open failed");
@@ -122,10 +135,11 @@ int main(int argc, char **argv)
 			hdr = (struct qai_kernel_block_in *)inbuf;
 			hdr->n_ref = n;
 			hdr->n_query = 1;
-			memcpy(inbuf + sizeof(*hdr), ref + r0 * FEAT,
-			       (size_t)n * FEAT * sizeof(float));
-			memcpy(inbuf + sizeof(*hdr) + n * FEAT * sizeof(float),
-			       query + q * FEAT, FEAT * sizeof(float));
+			hdr->n_qubits = n_qubits;
+			memcpy(inbuf + sizeof(*hdr), ref + r0 * feat,
+			       (size_t)n * feat * sizeof(float));
+			memcpy(inbuf + sizeof(*hdr) + n * feat * sizeof(float),
+			       query + q * feat, feat * sizeof(float));
 
 			memset(&op, 0, sizeof(op));
 			op.paramTypes = TEEC_PARAM_TYPES(
@@ -133,7 +147,7 @@ int main(int argc, char **argv)
 				TEEC_NONE, TEEC_NONE);
 			op.params[0].tmpref.buffer = inbuf;
 			op.params[0].tmpref.size =
-				sizeof(*hdr) + (n + 1) * FEAT * sizeof(float);
+				sizeof(*hdr) + (n + 1) * feat * sizeof(float);
 			op.params[1].tmpref.buffer = outbuf;
 			op.params[1].tmpref.size =
 				sizeof(*oh) + n * sizeof(float);

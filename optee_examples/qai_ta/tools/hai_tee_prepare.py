@@ -152,6 +152,27 @@ def main() -> None:
         raise SystemExit("QMOC landmarks do not match the fidelity reference rows")
     args.out_dir.joinpath("qmoc_ref.bin").write_bytes(np.ascontiguousarray(qmoc_ref, np.float32).tobytes())
     args.out_dir.joinpath("qmoc_cal.bin").write_bytes(np.ascontiguousarray(qmoc_cal, np.float32).tobytes())
+    keep32 = order[:32]
+    kept32 = [feat_names[i] for i in keep32]
+    sel32_train = train_z[tr_idx][:, keep32]
+    lo32 = sel32_train.min(axis=0)
+    hi32 = sel32_train.max(axis=0)
+    span32 = np.maximum(hi32 - lo32, 1e-8)
+
+    def ang32(z: np.ndarray) -> np.ndarray:
+        return ((z - lo32) / span32) * (2 * PI) - PI
+
+    ref32 = ang32(sel32_train)
+    query32 = ang32(test_z[te_idx][:, keep32])
+    qmoc32 = ang32(train_z[tr_n[:n_qmoc]][:, keep32])
+    cal32 = ang32(train_z[tr_n[n_qmoc : n_qmoc + n_cal]][:, keep32])
+    if not np.allclose(ref32[:, :N_FEAT], ref, atol=1e-5):
+        raise SystemExit("32-feature angles do not match the 16-feature reference")
+    args.out_dir.joinpath("ref32.bin").write_bytes(np.ascontiguousarray(ref32, np.float32).tobytes())
+    args.out_dir.joinpath("query32.bin").write_bytes(np.ascontiguousarray(query32, np.float32).tobytes())
+    args.out_dir.joinpath("qmoc_ref32.bin").write_bytes(np.ascontiguousarray(qmoc32, np.float32).tobytes())
+    args.out_dir.joinpath("qmoc_cal32.bin").write_bytes(np.ascontiguousarray(cal32, np.float32).tobytes())
+    args.out_dir.joinpath("features32.txt").write_text(",".join(kept32) + "\n")
     meta = args.out_dir / "meta.txt"
     meta.write_text(
         "\n".join(
@@ -169,6 +190,8 @@ def main() -> None:
                 f"n_sup_attack={len(sup_atk)}",
                 f"n_qmoc={n_qmoc}",
                 f"n_qmoc_cal={n_cal}",
+                "n_feat_16q=32",
+                "kept32=" + ",".join(kept32),
                 "kept=" + ",".join(kept_names),
             ]
         )

@@ -262,8 +262,8 @@ static TEE_Result cmd_hai_infer(uint32_t param_types, TEE_Param params[4])
 
 TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
 				     const float *query, uint32_t n_query,
-				     uint32_t reps, float *out_k,
-				     uint32_t *elapsed_ms);
+				     uint32_t reps, uint32_t n_qubits,
+				     float *out_k, uint32_t *elapsed_ms);
 
 static TEE_Result cmd_kernel_block_reps(uint32_t param_types,
 					TEE_Param params[4], uint32_t reps)
@@ -283,14 +283,18 @@ static TEE_Result cmd_kernel_block_reps(uint32_t param_types,
 	uint32_t ms = 0;
 	TEE_Result res;
 
+	uint32_t n_feat;
+
 	if (param_types != exp)
 		return TEE_ERROR_BAD_PARAMETERS;
 	if (params[0].memref.size < sizeof(in))
 		return TEE_ERROR_BAD_PARAMETERS;
 
 	TEE_MemMove(&in, params[0].memref.buffer, sizeof(in));
-	need_in = sizeof(in) + (in.n_ref + in.n_query) * QAI_KERNEL_FEAT *
-				       sizeof(float);
+	if (in.n_qubits != 8 && in.n_qubits != 16)
+		return TEE_ERROR_BAD_PARAMETERS;
+	n_feat = in.n_qubits * 2;
+	need_in = sizeof(in) + (in.n_ref + in.n_query) * n_feat * sizeof(float);
 	need_out = sizeof(out) + in.n_ref * in.n_query * sizeof(float);
 	if (params[0].memref.size < need_in || params[1].memref.size < need_out)
 		return TEE_ERROR_SHORT_BUFFER;
@@ -298,11 +302,11 @@ static TEE_Result cmd_kernel_block_reps(uint32_t param_types,
 	vecs = (const float *)((const uint8_t *)params[0].memref.buffer +
 			       sizeof(in));
 	ref = vecs;
-	query = vecs + in.n_ref * QAI_KERNEL_FEAT;
+	query = vecs + in.n_ref * n_feat;
 	k = (float *)((uint8_t *)params[1].memref.buffer + sizeof(out));
 
 	res = qai_fidelity_kernel_block(ref, in.n_ref, query, in.n_query, reps,
-					k, &ms);
+					in.n_qubits, k, &ms);
 	if (res != TEE_SUCCESS)
 		return res;
 

@@ -83,11 +83,13 @@ struct qai_fidelity_bench {
  *   in query-major order.
  */
 #define QAI_KERNEL_FEAT		16
+#define QAI_KERNEL_FEAT_MAX	32
 #define QAI_KERNEL_MAX_PAIRS	32
 
 struct qai_kernel_block_in {
 	uint32_t n_ref;
 	uint32_t n_query;
+	uint32_t n_qubits; /* 8 features=16, or 16 features=32 */
 };
 
 struct qai_kernel_block_out {

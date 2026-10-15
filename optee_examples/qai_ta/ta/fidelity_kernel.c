@@ -16,16 +16,27 @@
 
 #include <qai_ta.h>
 
-#define QAI_NQ		8
-#define QAI_DIM		256
-#define QAI_NFEAT	16
+#define QAI_NQ_8	8
+#define QAI_DIM_8	256
+#define QAI_NQ_MAX	16
+#define QAI_DIM_MAX	(1u << QAI_NQ_MAX)
+#define QAI_NFEAT_8	16
 #define QAI_REPS	3
 #define QAI_PI		3.14159265358979323846
 
-static double psi_re[QAI_DIM];
-static double psi_im[QAI_DIM];
-static double tmp_re[QAI_DIM / 2];
-static double tmp_im[QAI_DIM / 2];
+/* Sized for 16 qubits. An 8-qubit call uses the first 256 amplitudes. */
+static double psi_re[QAI_DIM_MAX];
+static double psi_im[QAI_DIM_MAX];
+static double tmp_re[QAI_DIM_MAX / 2];
+static double tmp_im[QAI_DIM_MAX / 2];
+static uint32_t kern_nq = QAI_NQ_8;
+static uint32_t kern_dim = QAI_DIM_8;
+
+static void kernel_select(uint32_t nq)
+{
+	kern_nq = nq;
+	kern_dim = 1u << nq;
+}
 
 static double k_sin(double x)
 {
@@ -95,7 +106,7 @@ static void apply_1q(int q, double g00r, double g00i, double g01r, double g01i,
 	int n0 = 0;
 	int bit = 1 << q;
 
-	for (i = 0; i < QAI_DIM; i++) {
+	for (i = 0; i < (int)kern_dim; i++) {
 		int j;
 
 		if (i & bit)
@@ -110,7 +121,7 @@ static void apply_1q(int q, double g00r, double g00i, double g01r, double g01i,
 	}
 
 	n0 = 0;
-	for (i = 0; i < QAI_DIM; i++) {
+	for (i = 0; i < (int)kern_dim; i++) {
 		double ar, ai, br, bi;
 		int j;
 
@@ -155,7 +166,7 @@ static void cnot_pair(int ctrl, int tgt)
 	int cbit = 1 << ctrl;
 	int tbit = 1 << tgt;
 
-	for (i = 0; i < QAI_DIM; i++) {
+	for (i = 0; i < (int)kern_dim; i++) {
 		double tr, ti;
 		int j;
 
@@ -176,11 +187,11 @@ static void cnot_ring(int reverse)
 	int q;
 
 	if (!reverse) {
-		for (q = 0; q < QAI_NQ; q++)
-			cnot_pair(q, (q + 1) % QAI_NQ);
+		for (q = 0; q < (int)kern_nq; q++)
+			cnot_pair(q, (q + 1) % (int)kern_nq);
 	} else {
-		for (q = QAI_NQ - 1; q >= 0; q--)
-			cnot_pair(q, (q + 1) % QAI_NQ);
+		for (q = (int)kern_nq - 1; q >= 0; q--)
+			cnot_pair(q, (q + 1) % (int)kern_nq);
 	}
 }
 
@@ -188,12 +199,12 @@ static void layer_fwd(const double *x)
 {
 	int q;
 
-	for (q = 0; q < QAI_NQ; q++) {
+	for (q = 0; q < (int)kern_nq; q++) {
 		apply_ry(q, x[2 * q]);
 		apply_rz(q, x[2 * q + 1]);
 	}
 	cnot_ring(0);
-	for (q = 0; q < QAI_NQ; q++) {
+	for (q = 0; q < (int)kern_nq; q++) {
 		apply_ry(q, x[2 * q]);
 		apply_rz(q, x[2 * q + 1]);
 	}
@@ -203,12 +214,12 @@ static void layer_inv(const double *y)
 {
 	int q;
 
-	for (q = QAI_NQ - 1; q >= 0; q--) {
+	for (q = (int)kern_nq - 1; q >= 0; q--) {
 		apply_rz(q, -y[2 * q + 1]);
 		apply_ry(q, -y[2 * q]);
 	}
 	cnot_ring(1);
-	for (q = QAI_NQ - 1; q >= 0; q--) {
+	for (q = (int)kern_nq - 1; q >= 0; q--) {
 		apply_rz(q, -y[2 * q + 1]);
 		apply_ry(q, -y[2 * q]);
 	}
@@ -218,7 +229,7 @@ static void reset_psi(void)
 {
 	int i;
 
-	for (i = 0; i < QAI_DIM; i++) {
+	for (i = 0; i < (int)kern_dim; i++) {
 		psi_re[i] = 0.0;
 		psi_im[i] = 0.0;
 	}
@@ -260,7 +271,7 @@ static void fill_vec(double *v)
 {
 	int i;
 
-	for (i = 0; i < QAI_NFEAT; i++)
+	for (i = 0; i < QAI_NFEAT_8; i++)
 		v[i] = next_angle();
 }
 
@@ -278,9 +289,9 @@ static uint32_t delta_ms(const TEE_Time *t0, const TEE_Time *t1)
 
 TEE_Result qai_fidelity_bench(uint32_t evals, struct qai_fidelity_bench *out)
 {
-	double x[QAI_NFEAT];
-	double y[QAI_NFEAT];
-	double self_x[QAI_NFEAT];
+	double x[QAI_NFEAT_8];
+	double y[QAI_NFEAT_8];
+	double self_x[QAI_NFEAT_8];
 	double acc = 0.0;
 	uint32_t i;
 	TEE_Time t0;
@@ -288,6 +299,7 @@ TEE_Result qai_fidelity_bench(uint32_t evals, struct qai_fidelity_bench *out)
 
 	if (evals > 20000)
 		return TEE_ERROR_BAD_PARAMETERS;
+	kernel_select(QAI_NQ_8);
 
 	TEE_MemFill(out, 0, sizeof(*out));
 	fill_vec(self_x);
@@ -307,38 +319,43 @@ TEE_Result qai_fidelity_bench(uint32_t evals, struct qai_fidelity_bench *out)
 	return TEE_SUCCESS;
 }
 
-static void load_feat(const float *src, double *dst)
+static void load_feat(const float *src, double *dst, uint32_t n_feat)
 {
 	uint32_t i;
 
-	for (i = 0; i < QAI_KERNEL_FEAT; i++)
+	for (i = 0; i < n_feat; i++)
 		dst[i] = (double)src[i];
 }
 
 TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
 				     const float *query, uint32_t n_query,
-				     uint32_t reps, float *out_k,
-				     uint32_t *elapsed_ms)
+				     uint32_t reps, uint32_t n_qubits,
+				     float *out_k, uint32_t *elapsed_ms)
 {
 	uint32_t q;
 	uint32_t r;
+	uint32_t n_feat;
 	TEE_Time t0;
 	TEE_Time t1;
-	double qv[QAI_KERNEL_FEAT];
-	double rv[QAI_KERNEL_FEAT];
+	double qv[QAI_KERNEL_FEAT_MAX];
+	double rv[QAI_KERNEL_FEAT_MAX];
 
 	if (n_ref == 0 || n_query == 0 || reps == 0 || reps > QAI_REPS)
+		return TEE_ERROR_BAD_PARAMETERS;
+	if (n_qubits != 8 && n_qubits != 16)
 		return TEE_ERROR_BAD_PARAMETERS;
 	if (n_ref > QAI_KERNEL_MAX_PAIRS || n_query > QAI_KERNEL_MAX_PAIRS)
 		return TEE_ERROR_BAD_PARAMETERS;
 	if (n_ref * n_query > QAI_KERNEL_MAX_PAIRS)
 		return TEE_ERROR_BAD_PARAMETERS;
 
+	kernel_select(n_qubits);
+	n_feat = n_qubits * 2;
 	TEE_GetSystemTime(&t0);
 	for (q = 0; q < n_query; q++) {
-		load_feat(query + q * QAI_KERNEL_FEAT, qv);
+		load_feat(query + q * n_feat, qv, n_feat);
 		for (r = 0; r < n_ref; r++) {
-			load_feat(ref + r * QAI_KERNEL_FEAT, rv);
+			load_feat(ref + r * n_feat, rv, n_feat);
 			out_k[q * n_ref + r] = (float)fidelity_exp_reps(qv, rv, reps);
 		}
 	}
