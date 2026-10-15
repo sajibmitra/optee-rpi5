@@ -10,6 +10,11 @@ This repo is independent (and may be used as a submodule elsewhere); it does
 - PDF: `rpi5-optee-manual.pdf` (≤ 10 pages)
 - Build `xtest` on device: `build-xtest-on-rpi5.md`
 
+## HAI quantum-hybrid SVM on Pi 5
+
+- Resource estimate (RAM, CPU time, rail power): [`hai-qhsvm-pi5-resource-estimate.md`](hai-qhsvm-pi5-resource-estimate.md)
+- Paper: [`2409.04935v1.pdf`](2409.04935v1.pdf)
+
 ## QAI-OPTEE prototype
 
 - **Running manual (start here):** [`qai-optee-running-manual.md`](qai-optee-running-manual.md)
