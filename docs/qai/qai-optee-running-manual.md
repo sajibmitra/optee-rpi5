@@ -7,8 +7,8 @@ Related docs:
 
 - Roadmap: [`qai-optee-prototype-roadmap.md`](qai-optee-prototype-roadmap.md)
 - Architecture: [`qai-optee-architecture.md`](qai-optee-architecture.md)
-- Example README: [`../optee_examples/qai_ta/README.md`](../optee_examples/qai_ta/README.md)
-- Base OP-TEE platform: [`../README.md`](../README.md)
+- Example README: [`../../optee_examples/qai_ta/README.md`](../../optee_examples/qai_ta/README.md)
+- Base OP-TEE platform: [`../../README.md`](../../README.md)
 
 ---
 

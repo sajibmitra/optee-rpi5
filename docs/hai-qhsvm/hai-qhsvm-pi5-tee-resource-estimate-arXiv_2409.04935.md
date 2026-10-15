@@ -6,11 +6,6 @@ fidelity kernel running **inside the OP-TEE Trusted Application**
 around the circuit loop. The Normal World only starts that one command
 (`qai_host --kernel-bench`) and reads the result back.
 
-This is the secure-world counterpart of
-[`hai-qhsvm-pi5-resource-estimate-arXiv_2409.04935.md`](hai-qhsvm-pi5-resource-estimate-arXiv_2409.04935.md).
-That earlier file is a Normal World NumPy process. It is not reused as a
-TEE number here.
-
 Paper: Cultice et al., arXiv:2409.04935v1, local copy
 [`2409.04935v1.pdf`](2409.04935v1.pdf).
 

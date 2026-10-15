@@ -14,37 +14,38 @@ Chronology of achieved milestones for this research track (Raspberry Pi 5 + real
 | ---- | --------- | ------- | ---- |
 | **2026-08 (late)** | Platform bring-up | TF-A armstub, OP-TEE OS, OP-TEE-enabled kernel, userspace (`optee_client` / `xtest`), and LAN deploy scripts landed in-repo. Secure World boots on Pi 5. | [`docs/README.md`](docs/README.md) |
 | **2026-08-29** | Repo / reproducible port | Initial `pi5-optee` tree published: scripts, artifacts, docs, vendored ATF / OP-TEE OS / client / test trees. | [`docs/README.md`](docs/README.md) |
-| **2026-08-31** | Regression validation | Full OP-TEE regression suite exercised on device; **114/114** cases passed (after plugin fix). Pre-built SD image published for fast replication. On-Pi `xtest` self-build guide added. | [`docs/build-xtest-on-rpi5.md`](docs/build-xtest-on-rpi5.md) |
-| **2026-08-31** | Platform documentation | Platform manual (`docs/rpi5-optee-manual.*`) and operator docs frozen as the infrastructure baseline. | [`docs/README.md`](docs/README.md) · PDF: [`docs/rpi5-optee-manual.pdf`](docs/rpi5-optee-manual.pdf) |
-| **2026-09-02** | QAI research plan | Hybrid QAI roadmap written: do **not** put full Qiskit/PennyLane in a TA; target REE features → TEE TinyML/QAI inference. | [`docs/qai-optee-prototype-roadmap.md`](docs/qai-optee-prototype-roadmap.md) |
-| **2026-09-08** | `qai_ta` prototype (Phases 2–10) | Dedicated TA + host under `optee_examples/qai_ta/`: baseline C inference, TinyML logistic model, quantum-inspired hybrid kernel, protected (encrypt-in-REE / decrypt-in-TEE) path, REE↔TEE timing harness, offline trainers. | [`docs/qai-optee-architecture.md`](docs/qai-optee-architecture.md) · [`optee_examples/qai_ta/README.md`](optee_examples/qai_ta/README.md) |
-| **2026-09-08** | Physical Pi validation | Deployed to `skmitra@172.20.10.2`. Baseline demo `[10, 20, -5, 3]` → **Prediction 1**, **Confidence 28**; TinyML / QAI / protected modes and `--bench` latency measured (~10–11 ms TEE invoke). Running manual published. | [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) |
+| **2026-08-31** | Regression validation | Full OP-TEE regression suite exercised on device; **114/114** cases passed (after plugin fix). Pre-built SD image published for fast replication. On-Pi `xtest` self-build guide added. | [`docs/platform/build-xtest-on-rpi5.md`](docs/platform/build-xtest-on-rpi5.md) |
+| **2026-08-31** | Platform documentation | Platform manual (`docs/platform/rpi5-optee-manual.*`) and operator docs frozen as the infrastructure baseline. | [`docs/README.md`](docs/README.md) · PDF: [`docs/platform/rpi5-optee-manual.pdf`](docs/platform/rpi5-optee-manual.pdf) |
+| **2026-09-02** | QAI research plan | Hybrid QAI roadmap written: do **not** put full Qiskit/PennyLane in a TA; target REE features → TEE TinyML/QAI inference. | [`docs/qai/qai-optee-prototype-roadmap.md`](docs/qai/qai-optee-prototype-roadmap.md) |
+| **2026-09-08** | `qai_ta` prototype (Phases 2–10) | Dedicated TA + host under `optee_examples/qai_ta/`: baseline C inference, TinyML logistic model, quantum-inspired hybrid kernel, protected (encrypt-in-REE / decrypt-in-TEE) path, REE↔TEE timing harness, offline trainers. | [`docs/qai/qai-optee-architecture.md`](docs/qai/qai-optee-architecture.md) · [`optee_examples/qai_ta/README.md`](optee_examples/qai_ta/README.md) |
+| **2026-09-08** | Physical Pi validation | Deployed to `skmitra@172.20.10.2`. Baseline demo `[10, 20, -5, 3]` → **Prediction 1**, **Confidence 28**; TinyML / QAI / protected modes and `--bench` latency measured (~10–11 ms TEE invoke). Running manual published. | [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) |
 
 ### Milestone map (roadmap phases)
 
 | ID | Status | Milestone | Primary docs |
 | -- | ------ | --------- | ------------ |
-| M1 | ✓ | OP-TEE on Raspberry Pi 5 + REE↔TEE (`xtest` / hello path) | [`docs/build-xtest-on-rpi5.md`](docs/build-xtest-on-rpi5.md) · [`docs/README.md`](docs/README.md) |
-| M2 | ✓ | Clean `qai_ta` (not `hello_world` forks) | [`docs/qai-optee-prototype-roadmap.md`](docs/qai-optee-prototype-roadmap.md) · [`optee_examples/qai_ta/README.md`](optee_examples/qai_ta/README.md) |
-| M3 | ✓ | C inference inside TEE | [`docs/qai-optee-prototype-roadmap.md`](docs/qai-optee-prototype-roadmap.md) · [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) |
-| M4 | ✓ | REE → QAI TA → REE client with timing | [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) |
-| M5 | ✓ | Offline TinyML train → params in TA | [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) (§8) · [`docs/qai-optee-prototype-roadmap.md`](docs/qai-optee-prototype-roadmap.md) |
-| M6 | ✓ | Quantum-inspired hybrid params (host train → compact TA kernel) | [`docs/qai-optee-prototype-roadmap.md`](docs/qai-optee-prototype-roadmap.md) · [`docs/qai-optee-architecture.md`](docs/qai-optee-architecture.md) |
-| M7 | ✓ | Security-sensitive model resident in OP-TEE | [`docs/qai-optee-architecture.md`](docs/qai-optee-architecture.md) |
-| M8 | ✓ | Protected feature path (prototype) | [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) (§6.5) · [`docs/qai-optee-architecture.md`](docs/qai-optee-architecture.md) |
-| M9 | ✓ | Measurement harness (REE vs TEE latency / model size hints) | [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) (§6.7–6.8) |
-| M10 | ✓ | Documented Hybrid QAI architecture + run manual | [`docs/qai-optee-architecture.md`](docs/qai-optee-architecture.md) · [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) |
+| M1 | ✓ | OP-TEE on Raspberry Pi 5 + REE↔TEE (`xtest` / hello path) | [`docs/platform/build-xtest-on-rpi5.md`](docs/platform/build-xtest-on-rpi5.md) · [`docs/README.md`](docs/README.md) |
+| M2 | ✓ | Clean `qai_ta` (not `hello_world` forks) | [`docs/qai/qai-optee-prototype-roadmap.md`](docs/qai/qai-optee-prototype-roadmap.md) · [`optee_examples/qai_ta/README.md`](optee_examples/qai_ta/README.md) |
+| M3 | ✓ | C inference inside TEE | [`docs/qai/qai-optee-prototype-roadmap.md`](docs/qai/qai-optee-prototype-roadmap.md) · [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) |
+| M4 | ✓ | REE → QAI TA → REE client with timing | [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) |
+| M5 | ✓ | Offline TinyML train → params in TA | [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) (§8) · [`docs/qai/qai-optee-prototype-roadmap.md`](docs/qai/qai-optee-prototype-roadmap.md) |
+| M6 | ✓ | Quantum-inspired hybrid params (host train → compact TA kernel) | [`docs/qai/qai-optee-prototype-roadmap.md`](docs/qai/qai-optee-prototype-roadmap.md) · [`docs/qai/qai-optee-architecture.md`](docs/qai/qai-optee-architecture.md) |
+| M7 | ✓ | Security-sensitive model resident in OP-TEE | [`docs/qai/qai-optee-architecture.md`](docs/qai/qai-optee-architecture.md) |
+| M8 | ✓ | Protected feature path (prototype) | [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) (§6.5) · [`docs/qai/qai-optee-architecture.md`](docs/qai/qai-optee-architecture.md) |
+| M9 | ✓ | Measurement harness (REE vs TEE latency / model size hints) | [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) (§6.7–6.8) |
+| M10 | ✓ | Documented Hybrid QAI architecture + run manual | [`docs/qai/qai-optee-architecture.md`](docs/qai/qai-optee-architecture.md) · [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) |
 
 ### Docs index (`docs/`)
 
 | Document | Purpose |
 | -------- | ------- |
 | [`docs/README.md`](docs/README.md) | Documentation index (platform + QAI) |
-| [`docs/build-xtest-on-rpi5.md`](docs/build-xtest-on-rpi5.md) | Build / verify `xtest` on the Pi |
-| [`docs/qai-optee-prototype-roadmap.md`](docs/qai-optee-prototype-roadmap.md) | Hybrid QAI research roadmap (Phases 1–10) |
-| [`docs/qai-optee-architecture.md`](docs/qai-optee-architecture.md) | Trust split, TA commands, security claim |
-| [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md) | Build, deploy, run, measure, troubleshoot |
-| [`docs/rpi5-optee-manual.pdf`](docs/rpi5-optee-manual.pdf) | Platform OP-TEE manual (PDF; source `.tex`) |
+| [`docs/platform/build-xtest-on-rpi5.md`](docs/platform/build-xtest-on-rpi5.md) | Build / verify `xtest` on the Pi |
+| [`docs/qai/qai-optee-prototype-roadmap.md`](docs/qai/qai-optee-prototype-roadmap.md) | Hybrid QAI research roadmap (Phases 1–10) |
+| [`docs/qai/qai-optee-architecture.md`](docs/qai/qai-optee-architecture.md) | Trust split, TA commands, security claim |
+| [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) | Build, deploy, run, measure, troubleshoot |
+| [`docs/platform/rpi5-optee-manual.pdf`](docs/platform/rpi5-optee-manual.pdf) | Platform OP-TEE manual (PDF; source `.tex`) |
+| [`docs/hai-qhsvm/`](docs/hai-qhsvm/) | Secure-world HAI fidelity measurements and Table I/II comparison |
 
 ### Next research steps (not yet claimed)
 
@@ -53,7 +54,7 @@ Chronology of achieved milestones for this research track (Raspberry Pi 5 + real
 - Energy / CPU util traces for publications
 - Optional: attested model provisioning
 
-How to reproduce the current QAI milestone: see [`docs/qai-optee-running-manual.md`](docs/qai-optee-running-manual.md).
+How to reproduce the current QAI milestone: see [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md).
 
 ## Quick start
 
@@ -101,9 +102,9 @@ export PI_SUDO_PASSWORD='...'
 
 ## Documentation
 
-- LaTeX / PDF: `docs/rpi5-optee-manual.tex`, `docs/rpi5-optee-manual.pdf`
-- QAI running manual: `docs/qai-optee-running-manual.md`
-- QAI prototype roadmap: `docs/qai-optee-prototype-roadmap.md`
+- LaTeX / PDF: `docs/platform/rpi5-optee-manual.tex`, `docs/platform/rpi5-optee-manual.pdf`
+- QAI running manual: `docs/qai/qai-optee-running-manual.md`
+- QAI prototype roadmap: `docs/qai/qai-optee-prototype-roadmap.md`
 - QAI TA example: `optee_examples/qai_ta/` (build/deploy via `scripts/` there)
 - Memory layout: `artifacts/rpi5-optee/MEMORY-LAYOUT.txt`
 - Local ATF / OP-TEE OS patches: `patches/`

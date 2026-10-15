@@ -219,6 +219,46 @@ static TEE_Result cmd_bench_fidelity(uint32_t param_types, TEE_Param params[4])
 	return TEE_SUCCESS;
 }
 
+TEE_Result qai_hai_infer(uint32_t model, const int32_t *rows, uint32_t n,
+			 int8_t *pred, uint32_t *elapsed_ms);
+
+static TEE_Result cmd_hai_infer(uint32_t param_types, TEE_Param params[4])
+{
+	uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
+				       TEE_PARAM_TYPE_MEMREF_OUTPUT,
+				       TEE_PARAM_TYPE_NONE,
+				       TEE_PARAM_TYPE_NONE);
+	struct qai_hai_infer_in in;
+	struct qai_hai_infer_out out;
+	const int32_t *rows;
+	int8_t pred[QAI_HAI_MAX_ROWS];
+	uint32_t ms = 0;
+	uint32_t need_in;
+	uint32_t need_out;
+	TEE_Result res;
+
+	if (param_types != exp)
+		return TEE_ERROR_BAD_PARAMETERS;
+	if (params[0].memref.size < sizeof(in))
+		return TEE_ERROR_BAD_PARAMETERS;
+	TEE_MemMove(&in, params[0].memref.buffer, sizeof(in));
+	need_in = sizeof(in) + in.n * QAI_HAI_FEAT * sizeof(int32_t);
+	need_out = sizeof(out) + in.n;
+	if (params[0].memref.size < need_in || params[1].memref.size < need_out)
+		return TEE_ERROR_SHORT_BUFFER;
+	rows = (const int32_t *)((const uint8_t *)params[0].memref.buffer +
+				 sizeof(in));
+	res = qai_hai_infer(in.model, rows, in.n, pred, &ms);
+	if (res != TEE_SUCCESS)
+		return res;
+	out.tee_elapsed_ms = ms;
+	out.n = in.n;
+	TEE_MemMove(params[1].memref.buffer, &out, sizeof(out));
+	TEE_MemMove((uint8_t *)params[1].memref.buffer + sizeof(out), pred, in.n);
+	params[1].memref.size = need_out;
+	return TEE_SUCCESS;
+}
+
 TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
 				     const float *query, uint32_t n_query,
 				     float *out_k, uint32_t *elapsed_ms);
@@ -290,6 +330,8 @@ TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx, uint32_t cmd_id,
 		return cmd_bench_fidelity(param_types, params);
 	case TA_QAI_CMD_KERNEL_BLOCK:
 		return cmd_kernel_block(param_types, params);
+	case TA_QAI_CMD_HAI_INFER:
+		return cmd_hai_infer(param_types, params);
 	default:
 		return TEE_ERROR_BAD_PARAMETERS;
 	}

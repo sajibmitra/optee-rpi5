@@ -10,7 +10,7 @@ CFLAGS += -Wall -Wextra -I../include -I$(TEEC_EXPORT)/include
 LDADD += -lteec -L$(TEEC_EXPORT)/lib
 
 .PHONY: all
-all: qai_host qai_hai_kernel
+all: qai_host qai_hai_kernel qai_hai_infer
 
 qai_host: main.o
 	$(CC) $(LDFLAGS) -o $@ main.o $(LDADD)
@@ -18,9 +18,12 @@ qai_host: main.o
 qai_hai_kernel: hai_kernel.o
 	$(CC) $(LDFLAGS) -o $@ hai_kernel.o $(LDADD)
 
+qai_hai_infer: hai_infer_client.o
+	$(CC) $(LDFLAGS) -o $@ hai_infer_client.o $(LDADD)
+
 .PHONY: clean
 clean:
-	rm -f main.o hai_kernel.o qai_host qai_hai_kernel
+	rm -f main.o hai_kernel.o hai_infer_client.o qai_host qai_hai_kernel qai_hai_infer
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

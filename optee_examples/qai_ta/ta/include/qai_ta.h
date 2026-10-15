@@ -22,6 +22,7 @@
 #define TA_QAI_CMD_GET_INFO		4 /* Model / TA metadata */
 #define TA_QAI_CMD_BENCH_FIDELITY	5 /* 8-qubit fidelity kernel, timed in TA */
 #define TA_QAI_CMD_KERNEL_BLOCK		6 /* fidelity rows on caller vectors */
+#define TA_QAI_CMD_HAI_INFER		7 /* HAI TinyML or QAI, fixed-point */
 
 #define QAI_MAX_FEATURES		16
 #define QAI_FEATURE_COUNT		4
@@ -91,6 +92,26 @@ struct qai_kernel_block_in {
 struct qai_kernel_block_out {
 	uint32_t tee_elapsed_ms;
 	uint32_t n_out;
+};
+
+/* TA_QAI_CMD_HAI_INFER.
+ * model 0 = logistic TinyML, model 1 = quantum-inspired QAI.
+ * Input: header, then int32 milli-z features[n * 16].
+ * Output: header, then int8 predictions[n] (1 = attack).
+ */
+#define QAI_HAI_FEAT		16
+#define QAI_HAI_MAX_ROWS	32
+#define QAI_HAI_MODEL_TINYML	0
+#define QAI_HAI_MODEL_QAI	1
+
+struct qai_hai_infer_in {
+	uint32_t model;
+	uint32_t n;
+};
+
+struct qai_hai_infer_out {
+	uint32_t tee_elapsed_ms;
+	uint32_t n;
 };
 
 #endif /* QAI_TA_H */

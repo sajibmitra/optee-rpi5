@@ -1,7 +1,7 @@
 # QAI-OPTEE Trusted Application (`qai_ta`)
 
 Hybrid QAI prototype for Raspberry Pi 5 + OP-TEE, following
-`docs/qai-optee-prototype-roadmap.md`.
+`docs/qai/qai-optee-prototype-roadmap.md`.
 
 ## Architecture
 

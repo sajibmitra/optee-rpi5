@@ -3,9 +3,6 @@
 Companion numbers:
 [`hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md`](hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md).
 
-The Normal World NumPy run is a different experiment:
-[`hai-qhsvm-pi5-resource-analysis-arXiv_2409.04935.md`](hai-qhsvm-pi5-resource-analysis-arXiv_2409.04935.md).
-
 This note records how the secure-world numbers were taken, and what they
 mean for training, inference, and hardware. The board has no quantum
 processor. The paper’s HAI table is a noiseless classical simulation. The

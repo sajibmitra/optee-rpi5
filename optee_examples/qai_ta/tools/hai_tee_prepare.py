@@ -115,6 +115,8 @@ def main() -> None:
         raise SystemExit("requested sample larger than remaining rows")
     tr_idx = tr_n[: args.n_train]
     te_idx = np.concatenate([held_nor[: args.n_test_normal], held_atk[: args.n_test_attack]])
+    sup_nor = held_nor[args.n_test_normal : args.n_test_normal + 2000]
+    sup_atk = held_atk[args.n_test_attack : args.n_test_attack + 2000]
 
     sel_train = train_z[tr_idx][:, keep]
     sel_test = test_z[te_idx][:, keep]
@@ -134,6 +136,10 @@ def main() -> None:
     args.out_dir.joinpath("labels.bin").write_bytes(np.ascontiguousarray(labels, np.int8).tobytes())
     args.out_dir.joinpath("classical_ref.bin").write_bytes(np.ascontiguousarray(classical_ref).tobytes())
     args.out_dir.joinpath("classical_query.bin").write_bytes(np.ascontiguousarray(classical_query).tobytes())
+    sup_x = np.vstack([test_z[sup_nor][:, keep], test_z[sup_atk][:, keep]])
+    sup_y = np.concatenate([np.zeros(len(sup_nor), np.int8), np.ones(len(sup_atk), np.int8)])
+    args.out_dir.joinpath("sup_x.bin").write_bytes(np.ascontiguousarray(sup_x, np.float32).tobytes())
+    args.out_dir.joinpath("sup_y.bin").write_bytes(np.ascontiguousarray(sup_y).tobytes())
     meta = args.out_dir / "meta.txt"
     meta.write_text(
         "\n".join(
@@ -147,6 +153,8 @@ def main() -> None:
                 f"test_attack_rate_full={test_y.mean():.6f}",
                 f"train_rows_after_ma={len(train_y)}",
                 f"test_rows_after_ma={len(test_y)}",
+                f"n_sup_normal={len(sup_nor)}",
+                f"n_sup_attack={len(sup_atk)}",
                 "kept=" + ",".join(kept_names),
             ]
         )
