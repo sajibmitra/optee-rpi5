@@ -12,17 +12,18 @@
 
 #define HAI_S ((int64_t)QAI_FP_SCALE)
 
-static int8_t hai_tinyml_one(const int32_t *x)
+static int8_t __attribute__((noinline)) hai_tinyml_one(const int32_t *x)
 {
 	int64_t acc = (int64_t)hai_tinyml_bias * HAI_S;
 	uint32_t i;
 
 	for (i = 0; i < QAI_HAI_FEAT; i++)
 		acc += (int64_t)hai_tinyml_w[i] * (int64_t)x[i];
+	asm volatile("" ::: "memory");
 	return acc > 0 ? 1 : 0;
 }
 
-static int8_t hai_qai_one(const int32_t *x)
+static int8_t __attribute__((noinline)) hai_qai_one(const int32_t *x)
 {
 	int64_t acc = (int64_t)hai_qai_bias * HAI_S;
 	uint32_t i;
@@ -35,29 +36,33 @@ static int8_t hai_qai_one(const int32_t *x)
 
 		acc += ((int64_t)hai_qai_gamma[i] * prod) / HAI_S;
 	}
+	asm volatile("" ::: "memory");
 	return acc > 0 ? 1 : 0;
 }
 
 TEE_Result qai_hai_infer(uint32_t model, const int32_t *rows, uint32_t n,
-			 int8_t *pred, uint32_t *elapsed_ms)
+			 uint32_t reps, int8_t *pred, uint32_t *elapsed_ms)
 {
 	uint32_t i;
+	uint32_t r;
 	TEE_Time t0;
 	TEE_Time t1;
 
-	if (n == 0 || n > QAI_HAI_MAX_ROWS)
+	if (n == 0 || n > QAI_HAI_MAX_ROWS || reps == 0)
 		return TEE_ERROR_BAD_PARAMETERS;
 	if (model != QAI_HAI_MODEL_TINYML && model != QAI_HAI_MODEL_QAI)
 		return TEE_ERROR_BAD_PARAMETERS;
 
 	TEE_GetSystemTime(&t0);
-	for (i = 0; i < n; i++) {
-		const int32_t *x = rows + i * QAI_HAI_FEAT;
+	for (r = 0; r < reps; r++) {
+		for (i = 0; i < n; i++) {
+			const int32_t *x = rows + i * QAI_HAI_FEAT;
 
-		if (model == QAI_HAI_MODEL_TINYML)
-			pred[i] = hai_tinyml_one(x);
-		else
-			pred[i] = hai_qai_one(x);
+			if (model == QAI_HAI_MODEL_TINYML)
+				pred[i] = hai_tinyml_one(x);
+			else
+				pred[i] = hai_qai_one(x);
+		}
 	}
 	TEE_GetSystemTime(&t1);
 	{

@@ -107,6 +107,7 @@ struct qai_kernel_block_out {
 struct qai_hai_infer_in {
 	uint32_t model;
 	uint32_t n;
+	uint32_t reps;
 };
 
 struct qai_hai_infer_out {

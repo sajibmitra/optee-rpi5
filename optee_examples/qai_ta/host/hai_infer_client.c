@@ -48,10 +48,17 @@ int main(int argc, char **argv)
 	uint8_t *inbuf;
 	uint8_t *outbuf;
 
-	if (argc != 5)
-		errx(2, "Usage: %s model features.bin n_rows out.bin", argv[0]);
+	uint32_t reps = 1;
+
+	if (argc != 5 && argc != 6)
+		errx(2, "Usage: %s model features.bin n_rows out.bin [reps]",
+		     argv[0]);
 	model = (uint32_t)strtoul(argv[1], NULL, 10);
 	n = (uint32_t)strtoul(argv[3], NULL, 10);
+	if (argc == 6)
+		reps = (uint32_t)strtoul(argv[5], NULL, 10);
+	if (reps == 0)
+		errx(2, "reps must be > 0");
 	rows = calloc((size_t)n * QAI_HAI_FEAT, sizeof(int32_t));
 	pred = calloc(n, 1);
 	inbuf = malloc(sizeof(struct qai_hai_infer_in) +
@@ -85,6 +92,7 @@ int main(int argc, char **argv)
 		hdr = (struct qai_hai_infer_in *)inbuf;
 		hdr->model = model;
 		hdr->n = take;
+		hdr->reps = reps;
 		memcpy(inbuf + sizeof(*hdr), rows + done * QAI_HAI_FEAT,
 		       (size_t)take * QAI_HAI_FEAT * sizeof(int32_t));
 		memset(&op, 0, sizeof(op));
@@ -114,8 +122,8 @@ int main(int argc, char **argv)
 			err(1, "write");
 		fclose(f);
 	}
-	fprintf(stderr, "TEE_INFER_MS %llu\nN %u\nMODEL %u\n",
-		(unsigned long long)tee_ms, n, model);
+	fprintf(stderr, "TEE_INFER_MS %llu\nN %u\nMODEL %u\nREPS %u\n",
+		(unsigned long long)tee_ms, n, model, reps);
 	TEEC_CloseSession(&sess);
 	TEEC_FinalizeContext(&ctx);
 	free(rows);

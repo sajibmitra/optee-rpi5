@@ -220,7 +220,7 @@ static TEE_Result cmd_bench_fidelity(uint32_t param_types, TEE_Param params[4])
 }
 
 TEE_Result qai_hai_infer(uint32_t model, const int32_t *rows, uint32_t n,
-			 int8_t *pred, uint32_t *elapsed_ms);
+			 uint32_t reps, int8_t *pred, uint32_t *elapsed_ms);
 
 static TEE_Result cmd_hai_infer(uint32_t param_types, TEE_Param params[4])
 {
@@ -248,7 +248,8 @@ static TEE_Result cmd_hai_infer(uint32_t param_types, TEE_Param params[4])
 		return TEE_ERROR_SHORT_BUFFER;
 	rows = (const int32_t *)((const uint8_t *)params[0].memref.buffer +
 				 sizeof(in));
-	res = qai_hai_infer(in.model, rows, in.n, pred, &ms);
+	res = qai_hai_infer(in.model, rows, in.n, in.reps ? in.reps : 1, pred,
+			    &ms);
 	if (res != TEE_SUCCESS)
 		return res;
 	out.tee_elapsed_ms = ms;

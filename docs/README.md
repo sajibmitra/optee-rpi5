@@ -28,6 +28,8 @@ Directory: [`hai-qhsvm/`](hai-qhsvm/)
 - Secure-world estimate: [`hai-qhsvm/hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md`](hai-qhsvm/hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md)
 - Secure-world analysis: [`hai-qhsvm/hai-qhsvm-pi5-tee-resource-analysis-arXiv_2409.04935.md`](hai-qhsvm/hai-qhsvm-pi5-tee-resource-analysis-arXiv_2409.04935.md)
 - HAI 20.07 scored in the TA, compared with Tables I and II: [`hai-qhsvm/hai-qhsvm-pi5-tee-hai-tables-arXiv_2409.04935.md`](hai-qhsvm/hai-qhsvm-pi5-tee-hai-tables-arXiv_2409.04935.md)
+- TinyML HAI inference in the TA: [`hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-output.md`](hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-output.md)
+- TinyML compared with QAI on the same draw: [`hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-vs-qai.md`](hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-vs-qai.md)
 - Paper: [`hai-qhsvm/2409.04935v1.pdf`](hai-qhsvm/2409.04935v1.pdf)
 
 ## Build PDF (platform manual)
