@@ -1,0 +1,20 @@
+item,value,unit,notes
+source,https://github.com/icsdataset/hai,,hai-20.07
+train1_rows,309600,rows,86.0 h at 1 Hz
+train2_rows,241200,rows,67.0 h at 1 Hz
+test1_rows,291600,rows,81.0 h at 1 Hz
+test2_rows,153000,rows,42.5 h at 1 Hz
+train_rows_after_ma,550682,rows,window 60 inside each file
+test_rows_after_ma,444482,rows,
+test_attack_rows,17527,rows,
+test_attack_rate,0.0394,fraction,
+train_attack_rows_excluded,776,rows,Excluded from one-class training
+scored_train_normal_qoc,200,rows,seed 2409
+scored_landmarks_qmoc,1000,rows,First 200 match the QOC-SVM references
+calibration_normals_qmoc,400,rows,Not used as landmarks or as test rows
+supervised_train_normal,2000,rows,Disjoint from the test slice
+supervised_train_attack,2000,rows,
+scored_test_normal,400,rows,
+scored_test_attack,200,rows,2:1 mix. Not the 3.94 percent base rate.
+input_tags,59,columns,Between time and attack. attack_P1 attack_P2 attack_P3 unused
+kept_tags,16,columns,See features.csv

@@ -1,0 +1,15 @@
+file,kind,description,source_markdown
+algorithms.csv,report,"Algorithm identity, training regime, and TA command",hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-vs-qai.md
+accuracy.csv,benchmark,Accuracy precision recall and F1 on the shared 600-row HAI draw,hai-qhsvm/hai-qhsvm-pi5-tee-qmoc-svm.md
+confusion.csv,benchmark,Confusion counts where the full matrix was recorded,hai-qhsvm/hai-qhsvm-pi5-tee-qmoc-svm.md
+timing.csv,benchmark,Trusted Application time per model,hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-vs-qai.md
+memory.csv,benchmark,TA image and per-model memory,hai-qhsvm/hai-qhsvm-pi5-tee-qmoc-svm.md
+qmoc_bandwidth.csv,benchmark,QMOC-SVM training-only angle scale sweep,hai-qhsvm/hai-qhsvm-pi5-tee-qmoc-svm.md
+qmoc_nu.csv,benchmark,QMOC-SVM nu sweep on held-out normal rows,hai-qhsvm/hai-qhsvm-pi5-tee-qmoc-svm.md
+qoc_nu.csv,benchmark,QOC-SVM and classical RBF nu sweeps,hai-qhsvm/hai-qhsvm-pi5-tee-hai-tables-arXiv_2409.04935.md
+kernel_bench.csv,benchmark,Random-angle fidelity kernel rate inside the TA,hai-qhsvm/hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md
+power_samples.csv,benchmark,Board rail power while the TA kernel ran,hai-qhsvm/hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md
+resource_projection.csv,benchmark,One-core projections from the measured kernel rate,hai-qhsvm/hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md
+dataset.csv,report,HAI 20.07 files and the scored split,hai-qhsvm/hai-qhsvm-pi5-tee-hai-tables-arXiv_2409.04935.md
+features.csv,report,Sixteen tags kept for every scored model,hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-output.md
+device.csv,report,Raspberry Pi 5 and Trusted Application identity,hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-output.md

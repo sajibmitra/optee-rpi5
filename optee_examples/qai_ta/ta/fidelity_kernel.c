@@ -2,7 +2,8 @@
 /*
  * 8-qubit fidelity kernel timed inside the Trusted Application.
  *
- * Same schedule as the Normal World NumPy measurement of arXiv:2409.04935:
+ * QOC-SVM uses three repetitions through qai_fidelity_kernel_block().
+ * QMOC-SVM calls the same circuit with one repetition.
  * 16 features, dense-angle RY/RZ, nearest-neighbour CNOT ring, repeated
  * rotation, three repetitions, then U(y)^dagger, then exp(|amp[0]|^2).
  *
@@ -224,15 +225,15 @@ static void reset_psi(void)
 	psi_re[0] = 1.0;
 }
 
-static double fidelity_exp(const double *x, const double *y)
+static double fidelity_exp_reps(const double *x, const double *y, uint32_t reps)
 {
-	int r;
+	uint32_t r;
 	double p;
 
 	reset_psi();
-	for (r = 0; r < QAI_REPS; r++)
+	for (r = 0; r < reps; r++)
 		layer_fwd(x);
-	for (r = 0; r < QAI_REPS; r++)
+	for (r = 0; r < reps; r++)
 		layer_inv(y);
 	p = psi_re[0] * psi_re[0] + psi_im[0] * psi_im[0];
 	if (p < 0.0)
@@ -240,6 +241,11 @@ static double fidelity_exp(const double *x, const double *y)
 	if (p > 1.0)
 		p = 1.0;
 	return k_exp_unit(p);
+}
+
+static double fidelity_exp(const double *x, const double *y)
+{
+	return fidelity_exp_reps(x, y, QAI_REPS);
 }
 
 static uint32_t rng_state = 240904935u;
@@ -311,7 +317,8 @@ static void load_feat(const float *src, double *dst)
 
 TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
 				     const float *query, uint32_t n_query,
-				     float *out_k, uint32_t *elapsed_ms)
+				     uint32_t reps, float *out_k,
+				     uint32_t *elapsed_ms)
 {
 	uint32_t q;
 	uint32_t r;
@@ -320,7 +327,7 @@ TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
 	double qv[QAI_KERNEL_FEAT];
 	double rv[QAI_KERNEL_FEAT];
 
-	if (n_ref == 0 || n_query == 0)
+	if (n_ref == 0 || n_query == 0 || reps == 0 || reps > QAI_REPS)
 		return TEE_ERROR_BAD_PARAMETERS;
 	if (n_ref > QAI_KERNEL_MAX_PAIRS || n_query > QAI_KERNEL_MAX_PAIRS)
 		return TEE_ERROR_BAD_PARAMETERS;
@@ -332,7 +339,7 @@ TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
 		load_feat(query + q * QAI_KERNEL_FEAT, qv);
 		for (r = 0; r < n_ref; r++) {
 			load_feat(ref + r * QAI_KERNEL_FEAT, rv);
-			out_k[q * n_ref + r] = (float)fidelity_exp(qv, rv);
+			out_k[q * n_ref + r] = (float)fidelity_exp_reps(qv, rv, reps);
 		}
 	}
 	TEE_GetSystemTime(&t1);

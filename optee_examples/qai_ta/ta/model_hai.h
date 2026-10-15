@@ -8,11 +8,11 @@ static const int32_t hai_tinyml_w[QAI_HAI_FEAT] = {
 	1859, 1667, -536, 488, -1264, 160, -579, -284, 144, -259, 298, 183, -170, 222, -124, 156
 };
 static const int32_t hai_tinyml_bias = 2334;
-static const int32_t hai_qai_theta[QAI_HAI_FEAT] = {
+static const int32_t hai_pairwise_fake_theta[QAI_HAI_FEAT] = {
 	2141, 1403, -813, 739, -1562, -137, -477, 153, 166, -104, 885, 1244, -134, 30, -151, -529
 };
-static const int32_t hai_qai_gamma[QAI_HAI_FEAT] = {
+static const int32_t hai_pairwise_fake_gamma[QAI_HAI_FEAT] = {
 	-532, 67, 168, 51, 17, 315, -459, 24, -92, -6, 1038, 155, -9, 1, 27, -604
 };
-static const int32_t hai_qai_bias = 3262;
+static const int32_t hai_pairwise_fake_bias = 3262;
 #endif

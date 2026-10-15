@@ -69,14 +69,23 @@ int main(int argc, char **argv)
 	size_t in_cap;
 	size_t out_cap;
 
-	if (argc != 6) {
+	uint32_t cmd = TA_QAI_CMD_QOC_BLOCK;
+	const char *model_name = "QOC-SVM";
+	int base = 1;
+
+	if (argc == 7 && strcmp(argv[1], "--qmoc") == 0) {
+		cmd = TA_QAI_CMD_QMOC_BLOCK;
+		model_name = "QMOC-SVM";
+		base = 2;
+	}
+	if (argc != base + 5) {
 		fprintf(stderr,
-			"Usage: %s ref.bin n_ref query.bin n_query out.bin\n",
+			"Usage: %s [--qmoc] ref.bin n_ref query.bin n_query out.bin\n",
 			argv[0]);
 		return 2;
 	}
-	n_ref = (uint32_t)strtoul(argv[2], NULL, 10);
-	n_query = (uint32_t)strtoul(argv[4], NULL, 10);
+	n_ref = (uint32_t)strtoul(argv[base + 1], NULL, 10);
+	n_query = (uint32_t)strtoul(argv[base + 3], NULL, 10);
 	if (n_ref == 0 || n_query == 0 || n_ref > 100000 || n_query > 100000)
 		errx(1, "bad dimensions");
 
@@ -91,9 +100,9 @@ int main(int argc, char **argv)
 	outbuf = malloc(out_cap);
 	if (!ref || !query || !out || !inbuf || !outbuf)
 		err(1, "alloc");
-	if (read_matrix(argv[1], n_ref, ref) != 0)
+	if (read_matrix(argv[base], n_ref, ref) != 0)
 		err(1, "read ref");
-	if (read_matrix(argv[3], n_query, query) != 0)
+	if (read_matrix(argv[base + 2], n_query, query) != 0)
 		err(1, "read query");
 	if (tee_open(&ctx, &sess) != 0)
 		errx(1, "TEE open failed");
@@ -129,8 +138,7 @@ int main(int argc, char **argv)
 			op.params[1].tmpref.size =
 				sizeof(*oh) + n * sizeof(float);
 
-			res = TEEC_InvokeCommand(&sess, TA_QAI_CMD_KERNEL_BLOCK,
-						 &op, &err_origin);
+			res = TEEC_InvokeCommand(&sess, cmd, &op, &err_origin);
 			if (res != TEEC_SUCCESS)
 				errx(1, "invoke 0x%x origin 0x%x at q=%u r=%u",
 				     res, err_origin, q, r0);
@@ -148,7 +156,7 @@ int main(int argc, char **argv)
 	}
 
 	{
-		FILE *f = fopen(argv[5], "wb");
+		FILE *f = fopen(argv[base + 4], "wb");
 
 		if (!f)
 			err(1, "open out");
@@ -157,8 +165,8 @@ int main(int argc, char **argv)
 			err(1, "write out");
 		fclose(f);
 	}
-	fprintf(stderr, "TEE_KERNEL_MS %llu\nTEE_CALLS %llu\n",
-		(unsigned long long)tee_ms, (unsigned long long)calls);
+	fprintf(stderr, "MODEL_NAME %s\nTEE_KERNEL_MS %llu\nTEE_CALLS %llu\n",
+		model_name, (unsigned long long)tee_ms, (unsigned long long)calls);
 
 	TEEC_CloseSession(&sess);
 	TEEC_FinalizeContext(&ctx);

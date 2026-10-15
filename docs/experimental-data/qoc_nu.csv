@@ -1,0 +1,11 @@
+algorithm,nu,accuracy,precision,recall,f1,support_vectors,same_predictions_as_other_nu
+QOC-SVM,0.05,0.240,0.265,0.720,0.387,200,yes
+QOC-SVM,0.10,0.240,0.265,0.720,0.387,200,yes
+QOC-SVM,0.20,0.240,0.265,0.720,0.387,200,yes
+QOC-SVM,0.50,0.240,0.265,0.720,0.387,200,yes
+QOC-SVM angles x0.1,0.05,0.493,0.384,0.865,0.532,,same as nu 0.10
+QOC-SVM angles x0.1,0.10,0.493,0.384,0.865,0.532,,same as nu 0.05
+QOC-SVM angles x0.1,0.20,0.473,0.375,0.870,0.524,,
+Classical RBF,0.05,0.472,0.373,0.860,0.520,43,
+Classical RBF,0.10,0.467,0.371,0.865,0.520,44,
+Classical RBF,0.20,0.450,0.365,0.880,0.516,58,

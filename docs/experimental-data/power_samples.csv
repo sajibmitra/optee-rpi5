@@ -1,0 +1,9 @@
+sample,cpu_util_percent,rail_power_w,included_in_mean
+0,25.0,3.071,yes
+1,25.2,3.261,yes
+2,25.4,3.109,yes
+3,24.9,3.097,yes
+4,24.9,3.112,yes
+5,25.2,3.053,yes
+6,25.1,3.093,yes
+mean,25.1,3.114,yes

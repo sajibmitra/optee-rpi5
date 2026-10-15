@@ -1,0 +1,10 @@
+algorithm,workload,pairs_or_rows,tee_elapsed_ms,ms_per_pair,time_per_test_row,rows_per_s,notes
+TinyML,600 rows times 100000 passes,60000000,989,,,60700000,Single 600-row pass is below the 1 ms TEE tick. Per-row time is 16.5 ns.
+QOC-SVM,Gram 200x200,40000,9884,0.247,,,"3 repetitions, angles in [-pi, pi]"
+QOC-SVM,Test 600x200,120000,29640,0.247,49.4 ms,,Re-run under TA_QAI_CMD_QOC_BLOCK
+QOC-SVM angles x0.1,Gram 200x200,40000,9672,,,,Sensitivity run. Not re-timed with the rename.
+QOC-SVM angles x0.1,Test 600x200,120000,28886,,,,Sensitivity run. Not re-timed with the rename.
+QMOC-SVM,Gram 1000x1000,1000000,84783,0.085,,,"1 repetition, scale 0.18"
+QMOC-SVM,Calibration 400x1000,400000,33724,0.084,,,Held-out normal rows
+QMOC-SVM,Test 600x1000,600000,50848,0.085,84.7 ms,,
+Fidelity bench,20000 random angle pairs,20000,5246,0.2623,,3812.4,TA_QAI_CMD_BENCH_FIDELITY. Rate used for the full-file projection.

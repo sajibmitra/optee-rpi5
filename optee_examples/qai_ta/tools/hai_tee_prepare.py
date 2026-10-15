@@ -140,6 +140,18 @@ def main() -> None:
     sup_y = np.concatenate([np.zeros(len(sup_nor), np.int8), np.ones(len(sup_atk), np.int8)])
     args.out_dir.joinpath("sup_x.bin").write_bytes(np.ascontiguousarray(sup_x, np.float32).tobytes())
     args.out_dir.joinpath("sup_y.bin").write_bytes(np.ascontiguousarray(sup_y).tobytes())
+    n_qmoc = 1000
+    n_cal = 400
+    if n_qmoc + n_cal > len(tr_n):
+        raise SystemExit("not enough normal training rows for QMOC-SVM")
+    qmoc_z = train_z[tr_n[:n_qmoc]][:, keep]
+    cal_z = train_z[tr_n[n_qmoc : n_qmoc + n_cal]][:, keep]
+    qmoc_ref = ((qmoc_z - lo) / span) * (2 * PI) - PI
+    qmoc_cal = ((cal_z - lo) / span) * (2 * PI) - PI
+    if not np.allclose(qmoc_ref[: args.n_train], ref, atol=1e-5):
+        raise SystemExit("QMOC landmarks do not match the fidelity reference rows")
+    args.out_dir.joinpath("qmoc_ref.bin").write_bytes(np.ascontiguousarray(qmoc_ref, np.float32).tobytes())
+    args.out_dir.joinpath("qmoc_cal.bin").write_bytes(np.ascontiguousarray(qmoc_cal, np.float32).tobytes())
     meta = args.out_dir / "meta.txt"
     meta.write_text(
         "\n".join(
@@ -155,6 +167,8 @@ def main() -> None:
                 f"test_rows_after_ma={len(test_y)}",
                 f"n_sup_normal={len(sup_nor)}",
                 f"n_sup_attack={len(sup_atk)}",
+                f"n_qmoc={n_qmoc}",
+                f"n_qmoc_cal={n_cal}",
                 "kept=" + ",".join(kept_names),
             ]
         )

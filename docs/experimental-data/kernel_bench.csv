@@ -1,0 +1,5 @@
+run,evals,tee_elapsed_ms,ms_per_kernel,kernels_per_s,ree_wall_us,used_for_projection
+smoke,20,8,0.400,,,no
+batch_a,8000,2116,0.2645,3780.7,2116191,no
+batch_b,8000,2096,0.2620,3816.8,2095634,no
+batch_c,20000,5246,0.2623,3812.4,5245950,yes

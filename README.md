@@ -45,7 +45,7 @@ Chronology of achieved milestones for this research track (Raspberry Pi 5 + real
 | [`docs/qai/qai-optee-architecture.md`](docs/qai/qai-optee-architecture.md) | Trust split, TA commands, security claim |
 | [`docs/qai/qai-optee-running-manual.md`](docs/qai/qai-optee-running-manual.md) | Build, deploy, run, measure, troubleshoot |
 | [`docs/platform/rpi5-optee-manual.pdf`](docs/platform/rpi5-optee-manual.pdf) | Platform OP-TEE manual (PDF; source `.tex`) |
-| [`docs/hai-qhsvm/`](docs/hai-qhsvm/) | Secure-world HAI fidelity measurements, TinyML inference, and QAI comparison |
+| [`docs/hai-qhsvm/`](docs/hai-qhsvm/) | Secure-world HAI measurements for TinyML, QOC-SVM, and QMOC-SVM |
 
 ### Next research steps (not yet claimed)
 

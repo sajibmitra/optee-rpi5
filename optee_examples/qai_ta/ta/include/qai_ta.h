@@ -21,8 +21,9 @@
 #define TA_QAI_CMD_INFER_PROTECTED	3 /* Phase 8: decrypt + infer */
 #define TA_QAI_CMD_GET_INFO		4 /* Model / TA metadata */
 #define TA_QAI_CMD_BENCH_FIDELITY	5 /* 8-qubit fidelity kernel, timed in TA */
-#define TA_QAI_CMD_KERNEL_BLOCK		6 /* fidelity rows on caller vectors */
+#define TA_QAI_CMD_QOC_BLOCK		6 /* QOC-SVM: 3-repetition fidelity */
 #define TA_QAI_CMD_HAI_INFER		7 /* HAI TinyML or QAI, fixed-point */
+#define TA_QAI_CMD_QMOC_BLOCK		8 /* QMOC-SVM: same kernel, 1 repetition */
 
 #define QAI_MAX_FEATURES		16
 #define QAI_FEATURE_COUNT		4
@@ -74,7 +75,7 @@ struct qai_fidelity_bench {
 	int64_t batch_sum_micro; /* sum of exp(K) over evals, * 1e6 */
 };
 
-/* TA_QAI_CMD_KERNEL_BLOCK input memref:
+/* TA_QAI_CMD_QOC_BLOCK input memref:
  *   struct qai_kernel_block_in, then float ref[n_ref * 16], then
  *   float query[n_query * 16], features already in [-pi, pi].
  * Output memref:
@@ -95,14 +96,14 @@ struct qai_kernel_block_out {
 };
 
 /* TA_QAI_CMD_HAI_INFER.
- * model 0 = logistic TinyML, model 1 = quantum-inspired QAI.
+ * model 0 = logistic TinyML, model 1 = QAI-pairwise(Fake).
  * Input: header, then int32 milli-z features[n * 16].
  * Output: header, then int8 predictions[n] (1 = attack).
  */
 #define QAI_HAI_FEAT		16
 #define QAI_HAI_MAX_ROWS	32
 #define QAI_HAI_MODEL_TINYML	0
-#define QAI_HAI_MODEL_QAI	1
+#define QAI_HAI_MODEL_PAIRWISE_FAKE	1 /* QAI-pairwise(Fake) */
 
 struct qai_hai_infer_in {
 	uint32_t model;

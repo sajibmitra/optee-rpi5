@@ -2,9 +2,7 @@
 
 A 16-feature logistic TinyML detector was trained on real HAI 20.07 rows and
 executed inside the OP-TEE Trusted Application on the Raspberry Pi 5 at
-`skmitra@172.20.10.2`. The same TA call also runs the repo’s quantum-inspired
-QAI scorer (linear terms plus adjacent feature products) so both models are
-measured on the same rows, with the same fixed-point weights, in secure world.
+`skmitra@172.20.10.2`.
 
 Training ran on the host. Inference, including the clock, ran in the TA.
 There is no GPU and no quantum processor on this board.
@@ -64,9 +62,9 @@ attack).
 
 ---
 
-## 3. Models inside the TA
+## 3. Model inside the TA
 
-Both models use milli-units, `QAI_FP_SCALE = 1000`. A host feature \(x\) is
+TinyML uses milli-units, `QAI_FP_SCALE = 1000`. A host feature \(x\) is
 sent as `int32` \(\mathrm{round}(x \times 1000)\). Weights in
 `ta/model_hai.h` are \(\mathrm{round}(w \times 1000)\).
 
@@ -79,28 +77,11 @@ sent as `int32` \(\mathrm{round}(x \times 1000)\). Weights in
 
 and the prediction is attack when `acc > 0`.
 
-**QAI pairwise** (`model = 1`). The same logistic regression on 32 inputs:
-the 16 features plus the 16 adjacent products \(x_i x_{(i+1) \bmod 16}\).
-The TA score is
+Quantized weights: bias 2334, and
 
-\[
-\mathrm{acc} = b \cdot S + \sum_i \theta_i x_i + \sum_i \frac{\gamma_i \, x_i x_{i+1}}{S}
-\]
+1859, 1667, −536, 488, −1264, 160, −579, −284, 144, −259, 298, 183, −170, 222, −124, 156.
 
-with the same threshold. This is the repo’s quantum-inspired integer model
-extended from the 4-feature demo to these 16 HAI features. It is not the
-8-qubit fidelity kernel.
-
-Quantized weights:
-
-| | bias | coefficients (milli-units) |
-|---|---:|---|
-| TinyML \(w\) | 2334 | 1859, 1667, −536, 488, −1264, 160, −579, −284, 144, −259, 298, 183, −170, 222, −124, 156 |
-| QAI \(\theta\) | 3262 | 2141, 1403, −813, 739, −1562, −137, −477, 153, 166, −104, 885, 1244, −134, 30, −151, −529 |
-| QAI \(\gamma\) | (same bias) | −532, 67, 168, 51, 17, 315, −459, 24, −92, −6, 1038, 155, −9, 1, 27, −604 |
-
-The 4-feature demo commands (`qai_host --tinyml`, `qai_host --qai`) are
-unchanged.
+The 4-feature demo command `qai_host --tinyml` is unchanged.
 
 ---
 
@@ -111,20 +92,18 @@ One pass of the 600 test rows, then a timed repeat of 100,000 passes
 fixed-point formula on all 600 rows, and they also match the float
 scikit-learn `predict` labels on all 600 rows (0 disagreements).
 
-`TEE_GetSystemTime` reports 0 ms for a single 600-row pass. Both models
-finish that pass below the 1 ms TEE tick. The rate below is the 100,000-pass
-loop, still timed inside the TA and summed across the 19 secure calls
-(32 rows per call, last call 24).
+`TEE_GetSystemTime` reports 0 ms for a single 600-row pass. TinyML finishes
+that pass below the 1 ms TEE tick. The rate below is the 100,000-pass loop,
+still timed inside the TA and summed across the 19 secure calls (32 rows per
+call, last call 24).
 
 | Model | TEE time for 6×10⁷ rows | Time per row | Rows / s |
 |---|---:|---:|---:|
 | TinyML | 989 ms | 16.5 ns | 6.07×10⁷ |
-| QAI pairwise | 4,308 ms | 71.8 ns | 1.39×10⁷ |
 
-One 600-row TinyML pass is about 9.9 µs of TA compute. One QAI pairwise pass
-is about 43 µs. Projecting the measured per-row time onto the full moving-average
-test capture (444,482 rows) gives about 7.3 ms for TinyML and about 32 ms for
-QAI pairwise, on one secure core, excluding the Normal World copy of the rows.
+One 600-row TinyML pass is about 9.9 µs of TA compute. Projecting the measured
+per-row time onto the full moving-average test capture (444,482 rows) gives
+about 7.3 ms, on one secure core, excluding the Normal World copy of the rows.
 
 ---
 
@@ -136,12 +115,10 @@ caught attack.
 | Model | Accuracy | Precision | Recall | F1 | Confusion |
 |---|---:|---:|---:|---:|---|
 | TinyML, TA | 84.0% | 0.736 | 0.810 | 0.771 | 342 / 58 / 38 / 162 |
-| QAI pairwise, TA | 85.7% | 0.762 | 0.830 | 0.794 | 348 / 52 / 34 / 166 |
 
 TinyML called 220 of 600 rows an attack (58 false attacks, 162 true attacks).
-QAI pairwise called 218 (52 false attacks, 166 true attacks).
 
-These are supervised detectors. They were trained with attack labels. They
-are not a one-class SVM, and they are not the published Table I protocol.
-The comparison with the in-TA fidelity kernel and with Table I is in
+This is a supervised detector. It was trained with attack labels. It is not a
+one-class SVM, and it is not the published Table I protocol. The comparison
+with QOC-SVM and QMOC-SVM is in
 [`hai-qhsvm-pi5-tee-tinyml-vs-qai.md`](hai-qhsvm-pi5-tee-tinyml-vs-qai.md).

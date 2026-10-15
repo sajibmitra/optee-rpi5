@@ -41,7 +41,7 @@ for scoring is `attack`.
 
 ## 2. What ran in the secure world
 
-Command `TA_QAI_CMD_KERNEL_BLOCK`, client `qai_hai_kernel`. Each call sends
+Command `TA_QAI_CMD_QOC_BLOCK` (QOC-SVM), client `qai_hai_kernel`. Each call sends
 real feature rows and returns \(\exp(K)\) from the same 8-qubit statevector
 used in the earlier TEE timing note. The TEE clock is `TEE_GetSystemTime`
 inside the loop. There is no quantum processor and no GPU.
@@ -79,9 +79,9 @@ raw 4% mix without saying so.
 
 | Kernel | Pairs | TEE time | ms / pair |
 |---|---:|---:|---:|
-| Train Gram, 200×200 | 40,000 | 9,647 ms | 0.241 |
-| Test kernel, 600×200 | 120,000 | 29,082 ms | 0.242 |
-| Total | 160,000 | **38.7 s** | 0.242 |
+| Train Gram, 200×200 | 40,000 | 9,884 ms | 0.247 |
+| Test kernel, 600×200 | 120,000 | 29,640 ms | 0.247 |
+| Total | 160,000 | **39.5 s** | 0.247 |
 
 Every diagonal entry was **2.718282**, which is \(e^{1}\) in float32. The
 inverse is correct on these HAI rows. Off-diagonal entries of the Gram matrix
@@ -101,7 +101,7 @@ Positive class = attack. One-class SVM from scikit-learn 1.9.1.
 its diagonal set to \(e\). The paper does not publish `nu`. Three values are
 reported rather than one value chosen after looking at the test labels.
 
-### 3.1 Quantum kernel from the TA, angles in \([-\pi,\pi]\)
+### 3.1 QOC-SVM, angles in \([-\pi,\pi]\)
 
 All four `nu` values produced the same predictions. All 200 training rows
 became support vectors, which is what a nearly diagonal kernel does.
@@ -163,9 +163,9 @@ matching classical row):
 |---|---|---:|---:|---:|---:|
 | Quantum, paper | 16 (8 qubits) | 87% | 0.88 | 0.87 | 0.86 |
 | Classical, paper | 16 | 73% | 0.81 | 0.73 | 0.65 |
-| Quantum, this TA, \([-\pi,\pi]\) | 16 (8 qubits) | 24.0% | 0.265 | 0.720 | 0.387 |
+| QOC-SVM, \([-\pi,\pi]\) | 16 (8 qubits) | 24.0% | 0.265 | 0.720 | 0.387 |
 | Classical RBF, this split, nu=0.05 | 16 | 47.2% | 0.373 | 0.860 | 0.520 |
-| Quantum, this TA, angles × 0.1, nu=0.05 | 16 (8 qubits) | 49.3% | 0.384 | 0.865 | 0.532 |
+| QOC-SVM, angles × 0.1, nu=0.05 | 16 (8 qubits) | 49.3% | 0.384 | 0.865 | 0.532 |
 
 The paper’s other quantum rows were not re-run here: 8 features / 4 qubits
 (86%, F1 0.85) and 24 features / 12 qubits (82%, F1 0.82). The TA statevector
@@ -231,7 +231,7 @@ run is not evidence about that wind-turbine result.
 - Kernel values are from the Pi’s Trusted Application. The SVM fit and the
   metric arithmetic ran on the host with scikit-learn. That split matches the
   paper: the quantum step builds the kernel, and scikit-learn solves the SVM.
-- Train width 200 and test width 600 are a compute limit (38.7 s of TEE time
+- Train width 200 and test width 600 are a compute limit (39.5 s of TEE time
   for the literal angle map), not a width printed in the paper.
 - `nu`, the decision-tree depth, and the exact Figure 4 gates are not in the
   PDF. The gates here are the schedule already checked by the \(e^{1}\)

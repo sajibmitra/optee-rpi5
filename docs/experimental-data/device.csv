@@ -1,0 +1,13 @@
+item,value
+board,Raspberry Pi 5 Model B Rev 1.1
+cpu,4x Cortex-A76
+frequency_hz,2400000000
+memtotal_kB,2021376
+kernel,Linux 6.18.46-v8-16k+
+arch,aarch64
+host,skmitra@172.20.10.2
+ta_uuid,24173bc2-5143-4d91-92c5-ffae31dc618d
+float_support,CFG_TA_FLOAT_SUPPORT=y
+quantum_processor,none
+gpu_used,none
+measurement_date,2026-10-15

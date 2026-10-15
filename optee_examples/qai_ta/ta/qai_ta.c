@@ -262,9 +262,11 @@ static TEE_Result cmd_hai_infer(uint32_t param_types, TEE_Param params[4])
 
 TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
 				     const float *query, uint32_t n_query,
-				     float *out_k, uint32_t *elapsed_ms);
+				     uint32_t reps, float *out_k,
+				     uint32_t *elapsed_ms);
 
-static TEE_Result cmd_kernel_block(uint32_t param_types, TEE_Param params[4])
+static TEE_Result cmd_kernel_block_reps(uint32_t param_types,
+					TEE_Param params[4], uint32_t reps)
 {
 	uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
 				       TEE_PARAM_TYPE_MEMREF_OUTPUT,
@@ -299,8 +301,8 @@ static TEE_Result cmd_kernel_block(uint32_t param_types, TEE_Param params[4])
 	query = vecs + in.n_ref * QAI_KERNEL_FEAT;
 	k = (float *)((uint8_t *)params[1].memref.buffer + sizeof(out));
 
-	res = qai_fidelity_kernel_block(ref, in.n_ref, query, in.n_query, k,
-					&ms);
+	res = qai_fidelity_kernel_block(ref, in.n_ref, query, in.n_query, reps,
+					k, &ms);
 	if (res != TEE_SUCCESS)
 		return res;
 
@@ -309,6 +311,16 @@ static TEE_Result cmd_kernel_block(uint32_t param_types, TEE_Param params[4])
 	TEE_MemMove(params[1].memref.buffer, &out, sizeof(out));
 	params[1].memref.size = need_out;
 	return TEE_SUCCESS;
+}
+
+static TEE_Result cmd_kernel_block(uint32_t param_types, TEE_Param params[4])
+{
+	return cmd_kernel_block_reps(param_types, params, 3);
+}
+
+static TEE_Result cmd_qmoc_block(uint32_t param_types, TEE_Param params[4])
+{
+	return cmd_kernel_block_reps(param_types, params, 1);
 }
 
 TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx, uint32_t cmd_id,
@@ -329,10 +341,12 @@ TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx, uint32_t cmd_id,
 		return cmd_get_info(param_types, params);
 	case TA_QAI_CMD_BENCH_FIDELITY:
 		return cmd_bench_fidelity(param_types, params);
-	case TA_QAI_CMD_KERNEL_BLOCK:
+	case TA_QAI_CMD_QOC_BLOCK:
 		return cmd_kernel_block(param_types, params);
 	case TA_QAI_CMD_HAI_INFER:
 		return cmd_hai_infer(param_types, params);
+	case TA_QAI_CMD_QMOC_BLOCK:
+		return cmd_qmoc_block(param_types, params);
 	default:
 		return TEE_ERROR_BAD_PARAMETERS;
 	}

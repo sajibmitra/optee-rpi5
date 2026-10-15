@@ -91,9 +91,9 @@ def main() -> None:
             "#include <qai_ta.h>",
             c_array("hai_tinyml_w", tw),
             f"static const int32_t hai_tinyml_bias = {tb};",
-            c_array("hai_qai_theta", theta),
-            c_array("hai_qai_gamma", gamma),
-            f"static const int32_t hai_qai_bias = {qb};",
+            c_array("hai_pairwise_fake_theta", theta),
+            c_array("hai_pairwise_fake_gamma", gamma),
+            f"static const int32_t hai_pairwise_fake_bias = {qb};",
             "#endif",
             "",
         ]

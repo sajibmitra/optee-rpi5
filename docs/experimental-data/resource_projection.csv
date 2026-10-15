@@ -1,0 +1,8 @@
+workload,calculation,result_value,result_unit,cores
+one sample vs full train file,637200/3812.4,167.1,s,1
+energy for that sample,167.1 s times 3.114 W,0.144,Wh,1
+rows absorbed in 1 s,measured kernel rate,3812,rows,1
+full test vs full train,442800*637200/3812.4,2.35,years,1
+kernel matrix if stored,637200*442800*8 bytes,2102,GiB,host
+normal world numpy same circuit,,3.95,ms per kernel,1
+normal world numpy one sample,,42,min,1

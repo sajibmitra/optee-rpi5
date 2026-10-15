@@ -1,0 +1,24 @@
+item,algorithm,bytes,notes
+signed_ta,shared,85152,Same image for TinyML QOC-SVM and QMOC-SVM
+text,shared,57736,ELF section of the image that ran the HAI commands
+rodata,shared,4895,
+data,shared,440,
+bss,shared,53424,Includes 32768 byte heap and 6144 byte statevector
+elf_span_through_bss,shared,132712,
+stack,shared,4096,TA_STACK_SIZE added on each call
+reserved_per_ta_call,shared,136808,ELF span plus stack
+statevector,QOC-SVM and QMOC-SVM,6144,psi_re psi_im tmp_re tmp_im. Resident for every command in this TA.
+weights,TinyML,68,16 int32 weights and one bias
+feature_row,TinyML,64,16 int32 milli-z values
+call_chunk,TinyML,2048,Up to 32 rows
+matrices_for_score,TinyML,38400,600 test rows
+weights,QOC-SVM,0,Circuit is code
+call_chunk,QOC-SVM,2112,32 references plus one query
+post_fit_references,QOC-SVM,12800,200 rows times 64 bytes. All 200 were support vectors.
+kernel_outputs_one_row,QOC-SVM,800,200 float32 fidelities
+matrices_for_score,QOC-SVM,691200,Gram 160000 plus test kernel 480000 plus feature files
+weights,QMOC-SVM,0,Same circuit as QOC-SVM
+call_chunk,QMOC-SVM,2112,32 references plus one query
+post_fit_support_vectors,QMOC-SVM,3520,55 support vectors times 64 bytes
+matrices_for_score,QMOC-SVM,8128000,"Gram 4000000, calibration 1600000, test 2400000, features 128000"
+normal_world_ram_kB,board,2021376,MemTotal on the Pi

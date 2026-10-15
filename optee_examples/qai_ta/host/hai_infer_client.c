@@ -122,7 +122,9 @@ int main(int argc, char **argv)
 			err(1, "write");
 		fclose(f);
 	}
-	fprintf(stderr, "TEE_INFER_MS %llu\nN %u\nMODEL %u\nREPS %u\n",
+	fprintf(stderr, "MODEL_NAME %s\nTEE_INFER_MS %llu\nN %u\nMODEL %u\nREPS %u\n",
+		model == QAI_HAI_MODEL_PAIRWISE_FAKE ? "QAI-pairwise(Fake)" :
+		model == QAI_HAI_MODEL_TINYML ? "TinyML" : "unknown",
 		(unsigned long long)tee_ms, n, model, reps);
 	TEEC_CloseSession(&sess);
 	TEEC_FinalizeContext(&ctx);
