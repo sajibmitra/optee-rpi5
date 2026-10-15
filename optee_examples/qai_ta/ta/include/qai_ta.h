@@ -21,6 +21,7 @@
 #define TA_QAI_CMD_INFER_PROTECTED	3 /* Phase 8: decrypt + infer */
 #define TA_QAI_CMD_GET_INFO		4 /* Model / TA metadata */
 #define TA_QAI_CMD_BENCH_FIDELITY	5 /* 8-qubit fidelity kernel, timed in TA */
+#define TA_QAI_CMD_KERNEL_BLOCK		6 /* fidelity rows on caller vectors */
 
 #define QAI_MAX_FEATURES		16
 #define QAI_FEATURE_COUNT		4
@@ -70,6 +71,26 @@ struct qai_fidelity_bench {
 	uint32_t tee_elapsed_ms;
 	int64_t self_exp_micro;  /* exp(|<0|U(x)^dag U(x)|0>|^2) * 1e6 */
 	int64_t batch_sum_micro; /* sum of exp(K) over evals, * 1e6 */
+};
+
+/* TA_QAI_CMD_KERNEL_BLOCK input memref:
+ *   struct qai_kernel_block_in, then float ref[n_ref * 16], then
+ *   float query[n_query * 16], features already in [-pi, pi].
+ * Output memref:
+ *   struct qai_kernel_block_out, then float expK[n_query * n_ref]
+ *   in query-major order.
+ */
+#define QAI_KERNEL_FEAT		16
+#define QAI_KERNEL_MAX_PAIRS	32
+
+struct qai_kernel_block_in {
+	uint32_t n_ref;
+	uint32_t n_query;
+};
+
+struct qai_kernel_block_out {
+	uint32_t tee_elapsed_ms;
+	uint32_t n_out;
 };
 
 #endif /* QAI_TA_H */

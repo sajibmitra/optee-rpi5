@@ -219,6 +219,57 @@ static TEE_Result cmd_bench_fidelity(uint32_t param_types, TEE_Param params[4])
 	return TEE_SUCCESS;
 }
 
+TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
+				     const float *query, uint32_t n_query,
+				     float *out_k, uint32_t *elapsed_ms);
+
+static TEE_Result cmd_kernel_block(uint32_t param_types, TEE_Param params[4])
+{
+	uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
+				       TEE_PARAM_TYPE_MEMREF_OUTPUT,
+				       TEE_PARAM_TYPE_NONE,
+				       TEE_PARAM_TYPE_NONE);
+	struct qai_kernel_block_in in;
+	struct qai_kernel_block_out out;
+	const float *vecs;
+	const float *ref;
+	const float *query;
+	float *k;
+	uint32_t need_in;
+	uint32_t need_out;
+	uint32_t ms = 0;
+	TEE_Result res;
+
+	if (param_types != exp)
+		return TEE_ERROR_BAD_PARAMETERS;
+	if (params[0].memref.size < sizeof(in))
+		return TEE_ERROR_BAD_PARAMETERS;
+
+	TEE_MemMove(&in, params[0].memref.buffer, sizeof(in));
+	need_in = sizeof(in) + (in.n_ref + in.n_query) * QAI_KERNEL_FEAT *
+				       sizeof(float);
+	need_out = sizeof(out) + in.n_ref * in.n_query * sizeof(float);
+	if (params[0].memref.size < need_in || params[1].memref.size < need_out)
+		return TEE_ERROR_SHORT_BUFFER;
+
+	vecs = (const float *)((const uint8_t *)params[0].memref.buffer +
+			       sizeof(in));
+	ref = vecs;
+	query = vecs + in.n_ref * QAI_KERNEL_FEAT;
+	k = (float *)((uint8_t *)params[1].memref.buffer + sizeof(out));
+
+	res = qai_fidelity_kernel_block(ref, in.n_ref, query, in.n_query, k,
+					&ms);
+	if (res != TEE_SUCCESS)
+		return res;
+
+	out.tee_elapsed_ms = ms;
+	out.n_out = in.n_ref * in.n_query;
+	TEE_MemMove(params[1].memref.buffer, &out, sizeof(out));
+	params[1].memref.size = need_out;
+	return TEE_SUCCESS;
+}
+
 TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx, uint32_t cmd_id,
 				      uint32_t param_types, TEE_Param params[4])
 {
@@ -237,6 +288,8 @@ TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx, uint32_t cmd_id,
 		return cmd_get_info(param_types, params);
 	case TA_QAI_CMD_BENCH_FIDELITY:
 		return cmd_bench_fidelity(param_types, params);
+	case TA_QAI_CMD_KERNEL_BLOCK:
+		return cmd_kernel_block(param_types, params);
 	default:
 		return TEE_ERROR_BAD_PARAMETERS;
 	}

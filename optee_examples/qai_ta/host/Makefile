@@ -6,22 +6,21 @@ OBJCOPY ?= $(CROSS_COMPILE)objcopy
 OBJDUMP ?= $(CROSS_COMPILE)objdump
 READELF ?= $(CROSS_COMPILE)readelf
 
-OBJS = main.o
-
 CFLAGS += -Wall -Wextra -I../include -I$(TEEC_EXPORT)/include
 LDADD += -lteec -L$(TEEC_EXPORT)/lib
 
-BINARY = qai_host
-
 .PHONY: all
-all: $(BINARY)
+all: qai_host qai_hai_kernel
 
-$(BINARY): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $< $(LDADD)
+qai_host: main.o
+	$(CC) $(LDFLAGS) -o $@ main.o $(LDADD)
+
+qai_hai_kernel: hai_kernel.o
+	$(CC) $(LDFLAGS) -o $@ hai_kernel.o $(LDADD)
 
 .PHONY: clean
 clean:
-	rm -f $(OBJS) $(BINARY)
+	rm -f main.o hai_kernel.o qai_host qai_hai_kernel
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

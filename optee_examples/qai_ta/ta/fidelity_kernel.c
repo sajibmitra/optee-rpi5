@@ -300,3 +300,42 @@ TEE_Result qai_fidelity_bench(uint32_t evals, struct qai_fidelity_bench *out)
 	out->batch_sum_micro = (int64_t)(acc * 1000000.0);
 	return TEE_SUCCESS;
 }
+
+static void load_feat(const float *src, double *dst)
+{
+	uint32_t i;
+
+	for (i = 0; i < QAI_KERNEL_FEAT; i++)
+		dst[i] = (double)src[i];
+}
+
+TEE_Result qai_fidelity_kernel_block(const float *ref, uint32_t n_ref,
+				     const float *query, uint32_t n_query,
+				     float *out_k, uint32_t *elapsed_ms)
+{
+	uint32_t q;
+	uint32_t r;
+	TEE_Time t0;
+	TEE_Time t1;
+	double qv[QAI_KERNEL_FEAT];
+	double rv[QAI_KERNEL_FEAT];
+
+	if (n_ref == 0 || n_query == 0)
+		return TEE_ERROR_BAD_PARAMETERS;
+	if (n_ref > QAI_KERNEL_MAX_PAIRS || n_query > QAI_KERNEL_MAX_PAIRS)
+		return TEE_ERROR_BAD_PARAMETERS;
+	if (n_ref * n_query > QAI_KERNEL_MAX_PAIRS)
+		return TEE_ERROR_BAD_PARAMETERS;
+
+	TEE_GetSystemTime(&t0);
+	for (q = 0; q < n_query; q++) {
+		load_feat(query + q * QAI_KERNEL_FEAT, qv);
+		for (r = 0; r < n_ref; r++) {
+			load_feat(ref + r * QAI_KERNEL_FEAT, rv);
+			out_k[q * n_ref + r] = (float)fidelity_exp(qv, rv);
+		}
+	}
+	TEE_GetSystemTime(&t1);
+	*elapsed_ms = delta_ms(&t0, &t1);
+	return TEE_SUCCESS;
+}

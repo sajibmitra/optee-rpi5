@@ -32,7 +32,7 @@ make -C "$QAI_DIR" \
 
 OUT="$QAI_DIR/out"
 mkdir -p "$OUT/ta" "$OUT/ca"
-cp -f "$QAI_DIR/host/qai_host" "$OUT/ca/"
+cp -f "$QAI_DIR/host/qai_host" "$QAI_DIR/host/qai_hai_kernel" "$OUT/ca/"
 cp -f "$QAI_DIR/ta/"*.ta "$OUT/ta/"
 echo "Built artifacts:"
 ls -la "$OUT/ca" "$OUT/ta"
