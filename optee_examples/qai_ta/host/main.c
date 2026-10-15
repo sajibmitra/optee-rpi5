@@ -10,6 +10,7 @@
  *   qai_host --bench N
  *   qai_host --ree-compare
  *   qai_host --info
+ *   qai_host --kernel-bench N
  */
 #include <err.h>
 #include <errno.h>
@@ -247,7 +248,8 @@ static void usage(const char *argv0)
 {
 	fprintf(stderr,
 		"Usage: %s [--baseline|--tinyml|--qai] [--protected]\n"
-		"          [--bench N] [--ree-compare] [--info]\n",
+		"          [--bench N] [--ree-compare] [--info]\n"
+		"          [--kernel-bench N]\n",
 		argv0);
 }
 
@@ -263,6 +265,7 @@ int main(int argc, char **argv)
 	int do_bench = 0;
 	int do_ree = 0;
 	int do_info = 0;
+	int do_kernel = 0;
 	int bench_n = 100;
 	int64_t elapsed = 0;
 	int i;
@@ -280,7 +283,11 @@ int main(int argc, char **argv)
 			do_ree = 1;
 		else if (!strcmp(argv[i], "--info"))
 			do_info = 1;
-		else if (!strcmp(argv[i], "--bench")) {
+		else if (!strcmp(argv[i], "--kernel-bench")) {
+			do_kernel = 1;
+			if (i + 1 < argc && argv[i + 1][0] != '-')
+				bench_n = atoi(argv[++i]);
+		} else if (!strcmp(argv[i], "--bench")) {
 			do_bench = 1;
 			if (i + 1 < argc && argv[i + 1][0] != '-')
 				bench_n = atoi(argv[++i]);
@@ -321,6 +328,49 @@ int main(int argc, char **argv)
 			printf("TA heap hint         : %u bytes\n",
 			       info.heap_hint_bytes);
 		}
+		goto done;
+	}
+
+	if (do_kernel) {
+		TEEC_Operation op;
+		TEEC_Result res;
+		uint32_t err_origin;
+		struct qai_fidelity_bench kb;
+		int64_t t0, t1;
+
+		memset(&op, 0, sizeof(op));
+		memset(&kb, 0, sizeof(kb));
+		op.paramTypes = TEEC_PARAM_TYPES(TEEC_VALUE_INPUT,
+						 TEEC_MEMREF_TEMP_OUTPUT,
+						 TEEC_NONE, TEEC_NONE);
+		op.params[0].value.a = (uint32_t)bench_n;
+		op.params[1].tmpref.buffer = &kb;
+		op.params[1].tmpref.size = sizeof(kb);
+
+		printf("Fidelity kernel inside TA, evals=%d\n", bench_n);
+		t0 = now_us();
+		res = TEEC_InvokeCommand(&sess, TA_QAI_CMD_BENCH_FIDELITY, &op,
+					 &err_origin);
+		t1 = now_us();
+		if (res != TEEC_SUCCESS) {
+			fprintf(stderr,
+				"BENCH_FIDELITY failed 0x%x origin 0x%x\n",
+				res, err_origin);
+			goto fail;
+		}
+		printf("self_exp_micro     : %" PRId64 " (trunc(e*1e6)=2718281)\n",
+		       kb.self_exp_micro);
+		printf("TEE evals          : %u\n", kb.evals);
+		printf("TEE elapsed        : %u ms\n", kb.tee_elapsed_ms);
+		if (kb.evals > 0 && kb.tee_elapsed_ms > 0) {
+			printf("TEE per kernel     : %.4f ms\n",
+			       (double)kb.tee_elapsed_ms / (double)kb.evals);
+			printf("TEE kernels per s  : %.2f\n",
+			       1000.0 * (double)kb.evals /
+				       (double)kb.tee_elapsed_ms);
+		}
+		printf("TEE batch_sum_micro: %" PRId64 "\n", kb.batch_sum_micro);
+		printf("REE wall around invoke : %" PRId64 " us\n", t1 - t0);
 		goto done;
 	}
 

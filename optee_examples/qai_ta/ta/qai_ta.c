@@ -194,6 +194,31 @@ static TEE_Result cmd_get_info(uint32_t param_types, TEE_Param params[4])
 	return TEE_SUCCESS;
 }
 
+TEE_Result qai_fidelity_bench(uint32_t evals, struct qai_fidelity_bench *out);
+
+static TEE_Result cmd_bench_fidelity(uint32_t param_types, TEE_Param params[4])
+{
+	uint32_t exp = TEE_PARAM_TYPES(TEE_PARAM_TYPE_VALUE_INPUT,
+				       TEE_PARAM_TYPE_MEMREF_OUTPUT,
+				       TEE_PARAM_TYPE_NONE,
+				       TEE_PARAM_TYPE_NONE);
+	struct qai_fidelity_bench out;
+	TEE_Result res;
+
+	if (param_types != exp)
+		return TEE_ERROR_BAD_PARAMETERS;
+	if (params[1].memref.size < sizeof(out))
+		return TEE_ERROR_SHORT_BUFFER;
+
+	res = qai_fidelity_bench(params[0].value.a, &out);
+	if (res != TEE_SUCCESS)
+		return res;
+
+	TEE_MemMove(params[1].memref.buffer, &out, sizeof(out));
+	params[1].memref.size = sizeof(out);
+	return TEE_SUCCESS;
+}
+
 TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx, uint32_t cmd_id,
 				      uint32_t param_types, TEE_Param params[4])
 {
@@ -210,6 +235,8 @@ TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx, uint32_t cmd_id,
 		return cmd_infer_protected(param_types, params);
 	case TA_QAI_CMD_GET_INFO:
 		return cmd_get_info(param_types, params);
+	case TA_QAI_CMD_BENCH_FIDELITY:
+		return cmd_bench_fidelity(param_types, params);
 	default:
 		return TEE_ERROR_BAD_PARAMETERS;
 	}

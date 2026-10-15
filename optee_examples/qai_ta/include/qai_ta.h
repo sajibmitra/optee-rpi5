@@ -20,6 +20,7 @@
 #define TA_QAI_CMD_INFER_QAI		2 /* Phase 6/9: quantum-inspired */
 #define TA_QAI_CMD_INFER_PROTECTED	3 /* Phase 8: decrypt + infer */
 #define TA_QAI_CMD_GET_INFO		4 /* Model / TA metadata */
+#define TA_QAI_CMD_BENCH_FIDELITY	5 /* 8-qubit fidelity kernel, timed in TA */
 
 #define QAI_MAX_FEATURES		16
 #define QAI_FEATURE_COUNT		4
@@ -61,6 +62,14 @@ struct qai_info {
 	uint32_t qai_param_bytes;
 	uint32_t stack_hint_bytes;
 	uint32_t heap_hint_bytes;
+};
+
+/* Filled by TA_QAI_CMD_BENCH_FIDELITY. Clock is TEE_GetSystemTime. */
+struct qai_fidelity_bench {
+	uint32_t evals;
+	uint32_t tee_elapsed_ms;
+	int64_t self_exp_micro;  /* exp(|<0|U(x)^dag U(x)|0>|^2) * 1e6 */
+	int64_t batch_sum_micro; /* sum of exp(K) over evals, * 1e6 */
 };
 
 #endif /* QAI_TA_H */
