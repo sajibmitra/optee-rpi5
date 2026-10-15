@@ -1,6 +1,11 @@
-nu,calibration_false_alarm_rate,support_vectors,n_calibration,selected,test_labels_same_as_nu_0.01
-0.01,0.065,55,400,yes,yes
-0.02,0.065,55,400,no,yes
-0.05,0.082,80,400,no,
-0.10,0.130,118,400,no,
-0.20,0.205,215,400,no,
+nu,qubits,calibration_false_alarm_rate,support_vectors,n_calibration,selected,test_labels_same_as_nu_0.01
+0.01,8,0.065,55,400,yes,yes
+0.02,8,0.065,55,400,no,yes
+0.05,8,0.082,80,400,no,
+0.10,8,0.130,118,400,no,
+0.20,8,0.205,215,400,no,
+0.01,16,0.630,18,400,yes,yes
+0.02,16,0.6325,18,400,no,no
+0.05,16,0.630,18,400,no,no
+0.10,16,0.6325,18,400,no,no
+0.20,16,0.630,18,400,no,no

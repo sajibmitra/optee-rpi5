@@ -1,11 +1,20 @@
-scale,median_fidelity,n_landmarks,selected,notes
-1.00,0.002,48,no,Training pairs only
-0.50,0.004,48,no,
-0.25,0.083,48,no,Below the 0.10 to 0.50 band
-0.20,0.203,48,no,
-0.18,0.280,48,yes,Closest to target median fidelity 0.30 inside the band
-0.15,0.421,48,no,
-0.10,0.689,48,no,
-0.05,0.914,48,no,
-0.02,0.986,48,no,
-0.18,0.273,1000,yes,Off-diagonal median of the full Gram after the scale was locked
+scale,qubits,median_fidelity,n_landmarks,selected,notes
+1.00,8,0.002,48,no,Training pairs only
+0.50,8,0.004,48,no,
+0.25,8,0.083,48,no,Below the 0.10 to 0.50 band
+0.20,8,0.203,48,no,
+0.18,8,0.280,48,yes,Closest to target median fidelity 0.30 inside the band
+0.15,8,0.421,48,no,
+0.10,8,0.689,48,no,
+0.05,8,0.914,48,no,
+0.02,8,0.986,48,no,
+0.18,8,0.273,1000,yes,Off-diagonal median of the full Gram after the scale was locked
+1.00,16,0.0000,16,no,Training pairs only. 32 features.
+0.50,16,0.0000,16,no,
+0.25,16,0.0203,16,no,Below the 0.10 to 0.50 band
+0.18,16,0.1354,16,no,Inside the band and farther from 0.30 than scale 0.12
+0.12,16,0.4134,16,yes,Closest to target median fidelity 0.30 inside the band
+0.08,16,0.6809,16,no,
+0.05,16,0.8626,16,no,
+0.03,16,0.9497,16,no,
+0.12,16,0.3987,32,yes,Off-diagonal median of the 32x32 Gram after the scale was locked

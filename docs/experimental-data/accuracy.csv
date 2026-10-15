@@ -2,6 +2,8 @@ algorithm,source,n_test,n_test_normal,n_test_attack,accuracy,precision,recall,f1
 TinyML,measured_ta,600,400,200,0.840,0.736,0.810,0.771,2409
 QMOC-SVM,measured_ta,600,400,200,0.662,0.495,0.710,0.583,2409
 QOC-SVM,measured_ta,600,400,200,0.240,0.265,0.720,0.387,2409
+QOC-SVM 16q,measured_ta,600,400,200,0.2317,0.2579,0.6950,0.3762,2409
+QMOC-SVM 16q,measured_ta,600,400,200,0.3850,0.3461,0.9500,0.5073,2409
 QOC-SVM angles x0.1,measured_ta,600,400,200,0.493,0.384,0.865,0.532,2409
 Classical RBF nu 0.05,measured_host,600,400,200,0.472,0.373,0.860,0.520,2409
 Paper Table I quantum,paper,,,,0.87,0.88,0.87,0.86,

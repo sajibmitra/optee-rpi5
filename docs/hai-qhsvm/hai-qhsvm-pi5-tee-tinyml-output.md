@@ -24,10 +24,14 @@ There is no GPU and no quantum processor on this board.
 | Signed TA | 85,152 bytes |
 
 The signed image is the existing QAI TA with this command added. Section sizes
-of the linked ELF: `.text` 57,460, `.rodata` 4,891, `.data` 440, `.bss` 53,424.
-The `.bss` figure is dominated by the 8-qubit fidelity statevector that still
-lives in the same TA. The HAI logistic weights themselves are 17 int32 values
-(16 coefficients and one bias).
+of the ELF that produced the TinyML numbers below: `.text` 57,460,
+`.rodata` 4,891, `.data` 440, `.bss` 53,424. That `.bss` includes the 8-qubit
+fidelity statevector that lived in the same TA. A later image, used for the
+16-qubit QOC-SVM and QMOC-SVM runs, keeps the same command and enlarges
+`.bss` to 1,620,144 bytes so a 16-qubit statevector can sit beside TinyML.
+The HAI logistic weights themselves are 17 int32 values (16 coefficients and
+one bias). The TinyML accuracy and timing in this note were not re-measured
+on that larger image.
 
 ---
 

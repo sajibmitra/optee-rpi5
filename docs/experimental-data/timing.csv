@@ -7,4 +7,10 @@ QOC-SVM angles x0.1,Test 600x200,120000,28886,,,,Sensitivity run. Not re-timed w
 QMOC-SVM,Gram 1000x1000,1000000,84783,0.085,,,"1 repetition, scale 0.18"
 QMOC-SVM,Calibration 400x1000,400000,33724,0.084,,,Held-out normal rows
 QMOC-SVM,Test 600x1000,600000,50848,0.085,84.7 ms,,
-Fidelity bench,20000 random angle pairs,20000,5246,0.2623,,3812.4,TA_QAI_CMD_BENCH_FIDELITY. Rate used for the full-file projection.
+QOC-SVM 16q,Gram 16x16,256,39255,153.3,,,"3 repetitions, 32 features, angles in [-pi, pi]"
+QOC-SVM 16q,Test 600x16,9600,1472118,153.3,2454 ms,,Same 600-row draw. 16 references.
+QMOC-SVM 16q,Bandwidth 8 scales x 16x16,2048,104791,51.2,,,Training rows only. Scale 0.12 selected.
+QMOC-SVM 16q,Gram 32x32,1024,52640,51.4,,,"1 repetition, scale 0.12"
+QMOC-SVM 16q,Calibration 400x32,12800,654623,51.1,,,Held-out normal rows
+QMOC-SVM 16q,Test 600x32,19200,981759,51.1,1636 ms,,
+Fidelity bench,20000 random angle pairs,20000,5246,0.2623,,3812.4,TA_QAI_CMD_BENCH_FIDELITY. 8-qubit random angles. Rate used for the full-file projection.

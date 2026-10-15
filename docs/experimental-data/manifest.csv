@@ -11,5 +11,6 @@ kernel_bench.csv,benchmark,Random-angle fidelity kernel rate inside the TA,hai-q
 power_samples.csv,benchmark,Board rail power while the TA kernel ran,hai-qhsvm/hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md
 resource_projection.csv,benchmark,One-core projections from the measured kernel rate,hai-qhsvm/hai-qhsvm-pi5-tee-resource-estimate-arXiv_2409.04935.md
 dataset.csv,report,HAI 20.07 files and the scored split,hai-qhsvm/hai-qhsvm-pi5-tee-hai-tables-arXiv_2409.04935.md
-features.csv,report,Sixteen tags kept for every scored model,hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-output.md
+features.csv,report,Sixteen tags kept for TinyML and the 8-qubit models,hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-output.md
+features32.csv,report,Thirty-two tags for the 16-qubit models. The first sixteen match features.csv,hai-qhsvm/hai-qhsvm-pi5-tee-qmoc-svm.md
 device.csv,report,Raspberry Pi 5 and Trusted Application identity,hai-qhsvm/hai-qhsvm-pi5-tee-tinyml-output.md

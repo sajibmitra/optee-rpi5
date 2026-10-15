@@ -166,11 +166,17 @@ matching classical row):
 | QOC-SVM, \([-\pi,\pi]\) | 16 (8 qubits) | 24.0% | 0.265 | 0.720 | 0.387 |
 | Classical RBF, this split, nu=0.05 | 16 | 47.2% | 0.373 | 0.860 | 0.520 |
 | QOC-SVM, angles × 0.1, nu=0.05 | 16 (8 qubits) | 49.3% | 0.384 | 0.865 | 0.532 |
+| QOC-SVM 16q, \([-\pi,\pi]\), 16 references | 32 (16 qubits) | 23.2% | 0.258 | 0.695 | 0.376 |
+| QMOC-SVM 16q, scale 0.12, 32 landmarks | 32 (16 qubits) | 38.5% | 0.346 | 0.950 | 0.507 |
 
 The paper’s other quantum rows were not re-run here: 8 features / 4 qubits
-(86%, F1 0.85) and 24 features / 12 qubits (82%, F1 0.82). The TA statevector
-used for this measurement is 8 qubits, which is the row Table I and Table II
-both mark as their result.
+(86%, F1 0.85) and 24 features / 12 qubits (82%, F1 0.82). The 8-qubit
+statevector is the row Table I and Table II both mark as their result.
+A later 16-qubit run uses 32 features, which is not a Table I row. On the
+same 600 test rows, QOC-SVM 16q at \([-\pi,\pi]\) with 16 references scores
+23.2% / F1 0.376, and QMOC-SVM 16q at scale 0.12 with 32 landmarks scores
+38.5% / F1 0.507. Detail is in
+[`hai-qhsvm-pi5-tee-qmoc-svm.md`](hai-qhsvm-pi5-tee-qmoc-svm.md).
 
 What the comparison supports:
 
@@ -236,6 +242,9 @@ run is not evidence about that wind-turbine result.
 - `nu`, the decision-tree depth, and the exact Figure 4 gates are not in the
   PDF. The gates here are the schedule already checked by the \(e^{1}\)
   self-test.
-- 4-qubit and 12-qubit rows of Table I were not executed.
+- 4-qubit and 12-qubit rows of Table I were not executed. A 16-qubit,
+  32-feature variation was executed later, with 16 QOC-SVM references and
+  32 QMOC-SVM landmarks, because a pair at that width takes about 153 ms
+  (3 repetitions) or about 51 ms (1 repetition).
 - No number above was taken from the Normal World NumPy timing, and none of
   them is the 10.8 ms integer `qai_infer_qai` command.

@@ -89,7 +89,7 @@ struct qai_fidelity_bench {
 struct qai_kernel_block_in {
 	uint32_t n_ref;
 	uint32_t n_query;
-	uint32_t n_qubits; /* 8 features=16, or 16 features=32 */
+	uint32_t n_qubits; /* 8 → 16 features, or 16 → 32 features */
 };
 
 struct qai_kernel_block_out {

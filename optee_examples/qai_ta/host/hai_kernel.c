@@ -2,9 +2,10 @@
 /*
  * Ask the QAI TA to evaluate exp(fidelity) between HAI feature rows.
  *
- *   qai_hai_kernel ref.bin n_ref query.bin n_query out.bin
+ *   qai_hai_kernel [--qmoc|--qoc16|--qmoc16] ref.bin n_ref query.bin n_query out.bin
  *
- * Each *.bin is raw float32, row-major, 16 features per row.
+ * Default and --qmoc: 8 qubits, 16 float32 features per row.
+ * --qoc16 and --qmoc16: 16 qubits, 32 float32 features per row.
  * out.bin is raw float32, shape (n_query, n_ref), query-major.
  * TEE milliseconds are printed on stderr.
  */

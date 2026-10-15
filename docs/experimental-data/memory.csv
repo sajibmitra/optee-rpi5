@@ -22,3 +22,19 @@ call_chunk,QMOC-SVM,2112,32 references plus one query
 post_fit_support_vectors,QMOC-SVM,3520,55 support vectors times 64 bytes
 matrices_for_score,QMOC-SVM,8128000,"Gram 4000000, calibration 1600000, test 2400000, features 128000"
 normal_world_ram_kB,board,2021376,MemTotal on the Pi
+signed_ta,shared_16q_image,85160,Image that ran the 16-qubit scores. Also contains TinyML and the 8-qubit commands.
+text,shared_16q_image,57968,
+rodata,shared_16q_image,4895,
+data,shared_16q_image,448,
+bss,shared_16q_image,1620144,Includes 32768 byte heap and the 16-qubit statevector
+elf_span_through_bss,shared_16q_image,1699440,bss address 79296 plus bss size
+stack,shared_16q_image,4096,TA_STACK_SIZE added on each call
+reserved_per_ta_call,shared_16q_image,1703536,ELF span plus stack
+statevector,QOC-SVM 16q and QMOC-SVM 16q,1572864,65536 doubles times 2 plus 32768 doubles times 2. Resident for every command in this image.
+call_chunk,QOC-SVM 16q,4224,32 references plus one query at 32 float32 features
+post_fit_references,QOC-SVM 16q,2048,16 rows times 128 bytes. All 16 were support vectors.
+kernel_outputs_one_row,QOC-SVM 16q,64,16 float32 fidelities
+matrices_for_score,QOC-SVM 16q,118272,Gram 1024 plus test kernel 38400 plus feature files 78848
+call_chunk,QMOC-SVM 16q,4224,Same wire chunk as QOC-SVM 16q
+post_fit_support_vectors,QMOC-SVM 16q,2304,18 support vectors times 128 bytes
+matrices_for_score,QMOC-SVM 16q,264192,"Gram 4096, calibration 51200, test 76800, features 132096"

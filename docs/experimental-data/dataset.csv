@@ -17,4 +17,7 @@ supervised_train_attack,2000,rows,
 scored_test_normal,400,rows,
 scored_test_attack,200,rows,2:1 mix. Not the 3.94 percent base rate.
 input_tags,59,columns,Between time and attack. attack_P1 attack_P2 attack_P3 unused
-kept_tags,16,columns,See features.csv
+kept_tags,16,columns,See features.csv. Used by TinyML and the 8-qubit SVMs.
+kept_tags_16q,32,columns,See features32.csv. First 16 match features.csv.
+scored_train_normal_qoc_16q,16,rows,First 16 of the 200 QOC-SVM references. Cut for the 153 ms pair time.
+scored_landmarks_qmoc_16q,32,rows,First 32 of the 1000 QMOC-SVM landmarks. Cut for the 51 ms pair time.

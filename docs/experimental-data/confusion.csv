@@ -2,5 +2,7 @@ algorithm,source,tn,fp,fn,tp,n
 TinyML,measured_ta,342,58,38,162,600
 QMOC-SVM,measured_ta,255,145,58,142,600
 QOC-SVM,measured_ta,0,400,56,144,600
+QOC-SVM 16q,measured_ta,0,400,61,139,600
+QMOC-SVM 16q,measured_ta,41,359,10,190,600
 QOC-SVM angles x0.1 nu 0.05,measured_ta,123,277,27,173,600
 Classical RBF nu 0.05,measured_host,111,289,28,172,600

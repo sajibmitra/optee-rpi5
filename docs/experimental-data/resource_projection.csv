@@ -6,3 +6,5 @@ full test vs full train,442800*637200/3812.4,2.35,years,1
 kernel matrix if stored,637200*442800*8 bytes,2102,GiB,host
 normal world numpy same circuit,,3.95,ms per kernel,1
 normal world numpy one sample,,42,min,1
+QOC-SVM 16q full MA test vs 16 references,444482 rows times 2.45353 s,12.6,days,1
+QMOC-SVM 16q full MA test vs 32 landmarks,444482 rows times 1.636265 s,8.4,days,1

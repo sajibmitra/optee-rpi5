@@ -160,3 +160,10 @@ Preprocessing (moving average, z-score, scale to \([-\pi,\pi]\)) was not
 ported into the TA. The Normal World timing of that arithmetic remains about
 2.8 s for the training file and 1.9 s for the test file, on synthetic data
 of the paper’s width.
+
+A later measurement on the same board timed the HAI kernel at 16 qubits
+(65,536 amplitudes, 32 features). QOC-SVM, 3 repetitions, took 153.3 ms per
+pair. QMOC-SVM, 1 repetition, took 51.1 ms per pair. Those rates, and the
+scores on the 600-row draw, are in
+[`hai-qhsvm-pi5-tee-tinyml-vs-qai.md`](hai-qhsvm-pi5-tee-tinyml-vs-qai.md).
+They do not replace the 8-qubit projection above.
